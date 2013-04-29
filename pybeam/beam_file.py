@@ -13,3 +13,16 @@ class BeamFile(object):
 	@property
 	def atoms(self):
 		return self.selectChunkByName("Atom").payload.atom
+
+	@property
+	def exports(self):
+		expt = self.selectChunkByName("ExpT")
+		atoms = self.atoms
+		return [(atoms[e.function], e.arity, e.label) for e in expt.payload.entry]
+
+	@property
+	def imports(self):
+		impt = self.selectChunkByName("ImpT")
+		atoms = self.atoms
+		return [(atoms[e.module], atoms[e.function], e.arity) for e in impt.payload.entry]
+
