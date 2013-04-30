@@ -21,6 +21,7 @@
 #
 
 from construct import *
+from eetf_construct import term
 
 chunk_atom = Struct("chunk_atom",
 	UBInt32("len"),
@@ -57,6 +58,11 @@ chunk_loct = Struct("chunk_loct",
 	)
 	)
 
+chunk_attr = Struct("chunk_attr",
+	Const(UBInt8("131"),131),
+	term
+	)
+
 chunk = Struct("chunk",
 	String("chunk_name",4),
 	UBInt32("size"),
@@ -68,22 +74,22 @@ chunk = Struct("chunk",
 			"ImpT" : chunk_impt,
 #			"Code" : chunk_code,
 #			"StrT" : chunk_strt,
-#			"Attr" : chunk_attr,
+			"Attr" : chunk_attr,
 #			"CInf" : chunk_cinf,
 			"LocT" : chunk_loct,
 #			"Trac" : chunk_trac,
 			},
 			default = String("skip", lambda ctx: ctx.size)
 		),
-		Padding(lambda ctx: (ctx.size+4) % 4, pattern = "\00"),
+		Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = "\00"),
 		nested = False,
 	)
 	)
 
 beam = Struct("beam",
-	OneOf(String('for1',4),['FOR1']),
+	Const(String('for1',4),'FOR1'),
 	UBInt32("size"),
-	OneOf(String('beam',4),['BEAM']),
+	Const(String('beam',4),'BEAM'),
 	GreedyRange(chunk),
 	)
 

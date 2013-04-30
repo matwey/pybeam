@@ -48,3 +48,7 @@ class BeamFile(object):
 		atoms = self.atoms
 		return [(atoms[e.module], atoms[e.function], e.arity) for e in impt.payload.entry]
 
+	@property
+	def attributes(self):
+		attr = self.selectChunkByName("Attr")
+		return attr	
