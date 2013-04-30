@@ -24,77 +24,68 @@
 
 from construct import *
 
-atom_cache_ref = Struct("atom_cache_ref",
-		UBInt8("AtomCacheReferenceIndex")
+class TupleAdapter(Adapter):
+	def _decode(self, obj, ctx):
+# we got a list from construct and want to see a tuple
+		return tuple(obj)
+	def _encode(self, obj, ctv):
+		return list(obj)
+
+def BigInteger(subconname, length_field = UBInt8("length")):
+	def decode_big(obj,ctx):
+		ret = sum([d << i*8 for (d,i) in zip(obj.value,range(0,len(obj.value)))])
+		if obj.isNegative:
+			return -ret
+		return ret
+
+	def encode_big(obj,ctx):
+		isNegative = 0
+		if obj < 0:
+			isNegative = 1
+			obj = -obj
+		value = []
+		while obj > 0:
+			value.append(obj & 0xFF)
+			obj = obj >> 8
+		value.reverse()
+		return Container(isNegative=isNegative, value=value, length=len(value))
+
+	return ExprAdapter(Struct(subconname,
+		length_field,
+		UBInt8("isNegative"),
+		Array(lambda ctx: ctx.length, UBInt8("value")),
+		nested = False),
+		encoder = encode_big,
+		decoder = decode_big
 	)
 
-small_integer_ext = Struct("small_integer_ext",
-		UBInt8("Int")
-	)
-
-integer_ext = Struct("integer_ext",
-		UBInt32("Int")
-	)
-
-float_ext = Struct("float_ext",
-		String("Float",31)
-	)
-
-reference_ext = Struct("reference_ext",
+reference = Struct("reference",
 		LazyBound("Node", lambda : term),
 		UBInt32("ID"),
 		UBInt8("Creation"),
 	)
 
-port_ext = Struct("port_ext",
+port = Struct("port",
 		LazyBound("Node", lambda : term),
 		UBInt32("ID"),
 		UBInt8("Creation"),
 	)
 
-pid_ext = Struct("pid_ext",
+pid = Struct("pid",
 		LazyBound("Node", lambda : term),
 		UBInt32("ID"),
 		UBInt32("Serial"),
 		UBInt8("Creation"),
 	)
 
-small_tuple_ext = Struct("small_tuple_ext",
-		UBInt8("Arity"),
-		Array(lambda ctx: ctx.Arity, LazyBound("Elements",lambda : term))
-	)
-
-large_tuple_ext = Struct("large_tuple_ext",
-		UBInt32("Arity"),
-		Array(lambda ctx: ctx.Arity, LazyBound("Elements",lambda : term))
-	)
-
-list_ext = Struct("list_ext",
-		UBInt32("Length"),
-		Array(lambda ctx: ctx.Length-1, LazyBound("Elements",lambda : term)),
-		LazyBound("Tail", lambda : term)
-	)
-
-small_big_ext = Struct("small_integer_ext",
-		UBInt8("len"),
-		UBInt8("isNegative"),
-		String("data", lambda ctx: ctx.len)
-	)
-
-large_big_ext = Struct("large_integer_ext",
-		UBInt32("len"),
-		UBInt8("isNegative"),
-		String("Data", lambda ctx: ctx.len)
-	)
-
-new_reference_ext = Struct("new_reference_ext",
+new_reference = Struct("new_reference",
 		UBInt16("Len"),
 		LazyBound("Node", lambda : term),
 		UBInt8("Creation"),
 		Array(lambda ctx: ctx.len, UBInt32("ID"))
 	)
 
-fun_ext = Struct("fun_ext",
+fun = Struct("fun",
 		UBInt32("NumFree"),
 		LazyBound("Pid", lambda : term),
 		LazyBound("Module", lambda : term),
@@ -104,7 +95,7 @@ fun_ext = Struct("fun_ext",
 	)
 
 
-new_fun_ext = Struct("new_fun_ext",
+new_fun = Struct("new_fun",
 		UBInt32("Size"),
 		UBInt8("Arity"),
 		String("Uniq",16),
@@ -118,53 +109,55 @@ new_fun_ext = Struct("new_fun_ext",
 	)
 
 
-export_ext = Struct("export_ext",
+export = Struct("export",
 		LazyBound("Module", lambda : term),
 		LazyBound("Function", lambda : term),
 		LazyBound("Arity", lambda : term),
 	)
 
-bit_binary_ext = Struct("bit_binary_ext",
+bit_binary = Struct("bit_binary",
 		UBInt32("Len"),
 		UBInt8("Bits"),
 		String("Data", lambda ctx: ctx.len)
 	)
 
-new_float_ext = Struct("new_float_ext",
-		BFloat64("float")
-	)
-
-term = Struct("term",
+term = ExprAdapter(Struct("term",
 	UBInt8("tag"),
 	Switch("payload", lambda ctx: ctx.tag,
                 {
-			82: atom_cache_ref,
-			97: small_integer_ext,
-			98: integer_ext,
-			99: float_ext,
-			100: PascalString("atom_ext", length_field = UBInt16("length")),
-			101: reference_ext,
-			102: port_ext,
-			103: pid_ext,
-			104: small_tuple_ext,
-			105: large_tuple_ext,
-#			106: nil_ext,
-			107: PascalString("string_ext", length_field = UBInt16("length")),
-			108: list_ext,
-			109: PascalString("binary_ext", length_field = UBInt32("length")),
-			110: small_big_ext,
-			111: large_big_ext,
-			114: new_reference_ext,
-			115: PascalString("small_atom_ext"),
-			117: fun_ext,
-			112: new_fun_ext,
-			113: export_ext,
-			77: bit_binary_ext,
-			70: new_float_ext,
-			118: PascalString("atom_utf8_ext", length_field = UBInt16("length")),
-			119: PascalString("atom_utf8_ext"),
+			82: UBInt8("atom_cache_ref"),
+			97: UBInt8("small_integer"),
+			98: UBInt32("integer"),
+			99: ExprAdapter(String("float",31),
+				lambda obj, ctx: "%.20e" % obj,
+				lambda obj, ctx: float(obj)),
+			100: PascalString("atom", length_field = UBInt16("length")),
+			101: reference,
+			102: port,
+			103: pid,
+			104: TupleAdapter(PrefixedArray(LazyBound("small_tuple",lambda : term), length_field = UBInt8("arity"))),
+			105: TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term), length_field = UBInt32("arity"))),
+#			106: nil,
+			107: PascalString("string", length_field = UBInt16("length")),
+			108: PrefixedArray(LazyBound("list",lambda : term), length_field = UBInt32("arity")),
+			109: PascalString("binary", length_field = UBInt32("length")),
+			110: BigInteger("small_big", length_field = UBInt8("length")),
+			111: BigInteger("large_big", length_field = UBInt32("length")),
+			114: new_reference,
+			115: PascalString("small_atom"),
+			117: fun,
+			112: new_fun,
+			113: export,
+			77: bit_binary,
+			70: BFloat64("new_float"),
+			118: PascalString("atom_utf8", length_field = UBInt16("length")),
+			119: PascalString("small_atom_utf8"),
                 },
         ),
+	), 
+# FIXME: If we want to encode erlang data, we MUST put the tag code instead of zero here
+		lambda obj, ctx: (0, obj),
+		lambda obj, ctx: obj.payload
 	)
 
 __all__ = ["term"]
