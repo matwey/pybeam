@@ -22,9 +22,6 @@
 
 from construct import *
 
-def align4(n):
-	return n + ((n+4) % 4)
-
 chunk_atom = Struct("chunk_atom",
 	UBInt32("len"),
 	Array(lambda ctx: ctx.len, PascalString("atom"))
@@ -63,20 +60,24 @@ chunk_loct = Struct("chunk_loct",
 chunk = Struct("chunk",
 	String("chunk_name",4),
 	UBInt32("size"),
-	Switch("payload", lambda ctx: ctx.chunk_name,
-		{
-		"Atom" : chunk_atom,
-		"ExpT" : chunk_expt,
-		"ImpT" : chunk_impt,
-#		"Code" : chunk_code,
-#		"StrT" : chunk_strt,
-#		"Attr" : chunk_attr,
-#		"CInf" : chunk_cinf,
-		"LocT" : chunk_loct,
-#		"Trac" : chunk_trac,
-		},
-		default = String("skip", lambda ctx: align4(ctx.size))
-	),
+	SeqOfOne("payload",
+		Switch("payload", lambda ctx: ctx.chunk_name,
+			{
+			"Atom" : chunk_atom,
+			"ExpT" : chunk_expt,
+			"ImpT" : chunk_impt,
+#			"Code" : chunk_code,
+#			"StrT" : chunk_strt,
+#			"Attr" : chunk_attr,
+#			"CInf" : chunk_cinf,
+			"LocT" : chunk_loct,
+#			"Trac" : chunk_trac,
+			},
+			default = String("skip", lambda ctx: ctx.size)
+		),
+		Padding(lambda ctx: (ctx.size+4) % 4, pattern = "\00"),
+		nested = False,
+	)
 	)
 
 beam = Struct("beam",
