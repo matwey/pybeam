@@ -104,13 +104,14 @@ binary = ExprAdapter(PascalString("binary", length_field = UBInt32("length")),
 		decoder = lambda obj,ctx: Binary(obj))
 small_big = BigInteger("small_big", length_field = UBInt8("length"))
 large_big = BigInteger("large_big", length_field = UBInt32("length"))
-
-new_reference = Struct("new_reference",
+new_reference = ExprAdapter(Sequence("new_reference",
 		UBInt16("Len"),
 		LazyBound("Node", lambda : term),
 		UBInt8("Creation"),
-		Array(lambda ctx: ctx.len, UBInt32("ID"))
-	)
+		Array(lambda ctx: ctx.Len, UBInt32("ID")),
+		nested = False),
+		encoder = lambda obj,ctx: (len(obj.id), obj.node, obj.creation, obj.id),
+		decoder = lambda obj,ctx: Reference(obj[1], obj[3], obj[2]))
 
 fun = Struct("fun",
 		UBInt32("NumFree"),

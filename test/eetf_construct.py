@@ -51,6 +51,9 @@ class EETFConstructTest(unittest.TestCase):
 	def test_reference(self):
 		c = eetf_construct.reference
 		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), erlang_types.Reference("myatom",0x12,0x48))
+	def test_new_reference(self):
+		c = eetf_construct.new_reference
+		self.assertEqual(c.parse('\x00\x02\x64\x00\x06myatom\x48\x00\x00\x00\x12\x00\x00\x00\x13'), erlang_types.Reference("myatom",[0x12,0x13],0x48))
 	def test_port(self):
 		c = eetf_construct.port
 		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), erlang_types.Port("myatom",0x12,0x48))
