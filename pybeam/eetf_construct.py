@@ -22,7 +22,7 @@
 
 # External Term Format
 
-from erlang_types import AtomCacheReference 
+from erlang_types import AtomCacheReference, Reference, Port, Pid
 from construct import *
 
 atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
@@ -31,8 +31,16 @@ atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 small_integer = UBInt8("small_integer")
 integer = SBInt32("integer")
 float_ = ExprAdapter(String("float",31),
-		lambda obj,ctx: "%.20e    " % obj,
-		lambda obj,ctx: float(obj))
+		encoder = lambda obj,ctx: "%.20e    " % obj,
+		decoder = lambda obj,ctx: float(obj))
+atom = PascalString("atom", length_field = UBInt16("length"))
+reference = ExprAdapter(Sequence("reference",
+		LazyBound("Node", lambda : term),
+		UBInt32("ID"),
+		UBInt8("Creation"),
+		nested = False),
+		encoder = lambda obj,ctx: (obj.node, obj.id, obj.creation),
+		decoder = lambda obj,ctx: Reference(*obj))
 
 class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
@@ -67,12 +75,6 @@ def BigInteger(subconname, length_field = UBInt8("length")):
 		nested = False),
 		encoder = encode_big,
 		decoder = decode_big
-	)
-
-reference = Struct("reference",
-		LazyBound("Node", lambda : term),
-		UBInt32("ID"),
-		UBInt8("Creation"),
 	)
 
 port = Struct("port",

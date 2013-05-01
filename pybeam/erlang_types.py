@@ -31,6 +31,8 @@ class Reference:
 		self.node = node
 		self.id = id
 		self.creation = creation
+	def __eq__(self,other):
+		return self.node == other.node and self.id == other.id and self.creation == other.creation
 
 class Port:
 	def __init__(self, node, id, creation):

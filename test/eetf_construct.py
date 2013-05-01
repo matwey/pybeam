@@ -44,6 +44,13 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf_construct.float_
 		self.assertEqual(c.parse('     1.12344300000000002910e+04'), 11234.43)
 		self.assertEqual(c.parse(c.build(-3.1415926)),-3.1415926)
+	def test_atom(self):
+		c = eetf_construct.atom
+		self.assertEqual(c.parse('\x00\x06myatom'), 'myatom')
+                self.assertEqual(c.parse(c.build('robots')),'robots')
+	def test_reference(self):
+		c = eetf_construct.reference
+		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), erlang_types.Reference("myatom",0x12,0x48))
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
