@@ -65,6 +65,9 @@ pid = ExprAdapter(Sequence("pid",
 		decoder = lambda obj,ctx: Pid(*obj))
 small_tuple = TupleAdapter(PrefixedArray(LazyBound("small_tuple",lambda : term), length_field = UBInt8("arity")))
 large_tuple = TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term), length_field = UBInt32("arity")))
+nil = ExprAdapter(Sequence("nil"),
+		encoder = lambda obj,ctx: (),
+		decoder = lambda obj,ctx: [])
 
 def BigInteger(subconname, length_field = UBInt8("length")):
 	def decode_big(obj,ctx):
