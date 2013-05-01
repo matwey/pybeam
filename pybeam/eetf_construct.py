@@ -32,6 +32,33 @@ class TupleAdapter(Adapter):
 	def _encode(self, obj, ctv):
 		return list(obj)
 
+def BigInteger(subconname, length_field = UBInt8("length")):
+	def decode_big(obj,ctx):
+		(length, isNegative, value) = obj
+		ret = sum([d << i*8 for (d,i) in zip(value,range(0,len(value)))])
+		if isNegative:
+			return -ret
+		return ret
+
+	def encode_big(obj,ctx):
+		isNegative = 0
+		if obj < 0:
+			isNegative = 1
+			obj = -obj
+		value = []
+		while obj > 0:
+			value.append(obj & 0xFF)
+			obj = obj >> 8
+		return (len(value), isNegative, value)
+
+	return ExprAdapter(Sequence(subconname,
+		length_field,
+		UBInt8("isNegative"),
+		Array(lambda ctx: ctx.length, UBInt8("value")),
+		nested = False),
+		encoder = encode_big,
+		decoder = decode_big)
+
 atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		encoder = lambda obj,ctx: obj.index,
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
@@ -75,34 +102,8 @@ list_ = PrefixedArray(LazyBound("list",lambda : term), length_field = UBInt32("a
 binary = ExprAdapter(PascalString("binary", length_field = UBInt32("length")),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: Binary(obj))
-
-def BigInteger(subconname, length_field = UBInt8("length")):
-	def decode_big(obj,ctx):
-		ret = sum([d << i*8 for (d,i) in zip(obj.value,range(0,len(obj.value)))])
-		if obj.isNegative:
-			return -ret
-		return ret
-
-	def encode_big(obj,ctx):
-		isNegative = 0
-		if obj < 0:
-			isNegative = 1
-			obj = -obj
-		value = []
-		while obj > 0:
-			value.append(obj & 0xFF)
-			obj = obj >> 8
-		value.reverse()
-		return Container(isNegative=isNegative, value=value, length=len(value))
-
-	return ExprAdapter(Struct(subconname,
-		length_field,
-		UBInt8("isNegative"),
-		Array(lambda ctx: ctx.length, UBInt8("value")),
-		nested = False),
-		encoder = encode_big,
-		decoder = decode_big
-	)
+small_big = BigInteger("small_big", length_field = UBInt8("length"))
+large_big = BigInteger("large_big", length_field = UBInt32("length"))
 
 new_reference = Struct("new_reference",
 		UBInt16("Len"),

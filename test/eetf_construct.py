@@ -80,7 +80,17 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse('\x00\x00\x00\x0aRoBurToVoY'), erlang_types.Binary('RoBurToVoY'))
 		s = erlang_types.Binary('RoBurToVoY')
                 self.assertEqual(c.parse(c.build(s)),s)
-	
+	def test_small_big(self):
+		c = eetf_construct.small_big
+		self.assertEqual(c.parse('\x02\x00\x02\x01'), 258)
+		self.assertEqual(c.parse('\x02\x01\x02\x01'), -258)
+		self.assertEqual(c.parse(c.build(123456789123456789L)),123456789123456789L)
+	def test_large_big(self):
+		c = eetf_construct.large_big
+		self.assertEqual(c.parse('\x00\x00\x00\x02\x00\x02\x01'), 258)
+		self.assertEqual(c.parse(c.build(123456789123456789L)),123456789123456789L)
+
+
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
