@@ -44,6 +44,19 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf_construct.float_
 		self.assertEqual(c.parse('     1.12344300000000002910e+04'), 11234.43)
 		self.assertEqual(c.parse(c.build(-3.1415926)),-3.1415926)
+	def test_new_float(self):
+		c = eetf_construct.new_float
+		self.assertEqual(c.parse('\x40\x00\x00\x00\x00\x00\x00\x00'), 2.0 )
+		self.assertEqual(c.parse('\xc0\x00\x00\x00\x00\x00\x00\x00'), -2.0 )
+		self.assertEqual(c.parse(c.build(-3.1415926)),-3.1415926)
+	def test_atom_utf8(self):
+		c = eetf_construct.atom_utf8
+		self.assertEqual(c.parse('\x00\x06myatom'), 'myatom')
+                self.assertEqual(c.parse(c.build('robots')),'robots')
+	def test_small_atom_utf8(self):
+		c = eetf_construct.small_atom_utf8
+		self.assertEqual(c.parse('\x06myatom'), 'myatom')
+                self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_atom(self):
 		c = eetf_construct.atom
 		self.assertEqual(c.parse('\x00\x06myatom'), 'myatom')

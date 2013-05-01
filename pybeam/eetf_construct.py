@@ -139,6 +139,9 @@ bit_binary = ExprAdapter(Sequence("bit_binary",
 		nested = False),
 		encoder = lambda obj,ctx: (len(obj.value), obj.bits, obj.value),
 		decoder = lambda obj,ctx: BitBinary(obj[2],obj[1]))
+new_float = BFloat64("new_float")
+atom_utf8 = PascalString("atom_utf8", length_field = UBInt16("length"))
+small_atom_utf8 = PascalString("small_atom_utf8")
 
 term = ExprAdapter(Struct("term",
 	UBInt8("tag"),
