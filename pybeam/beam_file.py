@@ -53,3 +53,8 @@ class BeamFile(object):
 		attr = self.selectChunkByName("Attr")
 		# convert from proplist to dict
 		return dict(attr.payload.term)
+	
+	@property
+	def compileinfo(self):
+		cinf = self.selectChunkByName("CInf")
+		return dict(cinf.payload.term)

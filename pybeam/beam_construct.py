@@ -63,6 +63,11 @@ chunk_attr = Struct("chunk_attr",
 	term
 	)
 
+chunk_cinf = Struct("chunk_cinf",
+	Const(UBInt8("131"),131),
+	term
+	)
+
 chunk = Struct("chunk",
 	String("chunk_name",4),
 	UBInt32("size"),
@@ -75,7 +80,7 @@ chunk = Struct("chunk",
 #			"Code" : chunk_code,
 #			"StrT" : chunk_strt,
 			"Attr" : chunk_attr,
-#			"CInf" : chunk_cinf,
+			"CInf" : chunk_cinf,
 			"LocT" : chunk_loct,
 #			"Trac" : chunk_trac,
 			},
