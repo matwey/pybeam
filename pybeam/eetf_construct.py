@@ -22,7 +22,7 @@
 
 # External Term Format
 
-from erlang_types import AtomCacheReference, Reference, Port, Pid
+from erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary
 from construct import *
 
 class TupleAdapter(Adapter):
@@ -68,6 +68,9 @@ large_tuple = TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term),
 nil = ExprAdapter(Sequence("nil"),
 		encoder = lambda obj,ctx: (),
 		decoder = lambda obj,ctx: [])
+string = ExprAdapter(PascalString("string", length_field = UBInt16("length")),
+		encoder = lambda obj,ctx: obj.value,
+		decoder = lambda obj,ctx: etString(obj))
 
 def BigInteger(subconname, length_field = UBInt8("length")):
 	def decode_big(obj,ctx):
