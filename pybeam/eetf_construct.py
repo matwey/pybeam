@@ -72,6 +72,9 @@ string = ExprAdapter(PascalString("string", length_field = UBInt16("length")),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: etString(obj))
 list_ = PrefixedArray(LazyBound("list",lambda : term), length_field = UBInt32("arity"))
+binary = ExprAdapter(PascalString("binary", length_field = UBInt32("length")),
+		encoder = lambda obj,ctx: obj.value,
+		decoder = lambda obj,ctx: Binary(obj))
 
 def BigInteger(subconname, length_field = UBInt8("length")):
 	def decode_big(obj,ctx):

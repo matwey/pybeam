@@ -75,6 +75,12 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse('\x00\x0aRoBurToVoY'), erlang_types.String('RoBurToVoY'))
 		s = erlang_types.String('RoBurToVoY')
                 self.assertEqual(c.parse(c.build(s)),s)
+	def test_binary(self):
+		c = eetf_construct.binary
+		self.assertEqual(c.parse('\x00\x00\x00\x0aRoBurToVoY'), erlang_types.Binary('RoBurToVoY'))
+		s = erlang_types.Binary('RoBurToVoY')
+                self.assertEqual(c.parse(c.build(s)),s)
+	
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
