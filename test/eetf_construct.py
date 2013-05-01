@@ -25,10 +25,23 @@ from pybeam import erlang_types
 import unittest
 
 class EETFConstructTest(unittest.TestCase):
-	def atom_cache_ref(self):
+	def setUp(self):
+		pass
+	def test_atom_cache_ref(self):
 		c = eetf_construct.atom_cache_ref
-		self.assertEqual(c.parse('\82\123'), erlang_types.AtomCacheReference(123))
+		self.assertEqual(c.parse('\123'), erlang_types.AtomCacheReference(123))
 		self.assertEqual(c.parse(c.build(erlang_types.AtomCacheReference(123))),erlang_types.AtomCacheReference(123))
+	def test_small_integer(self):
+		c = eetf_construct.small_integer
+		self.assertEqual(c.parse('\x23'), 0x23)
+		self.assertEqual(c.parse(c.build(123)),123)
+	def test_integer(self):
+		c = eetf_construct.integer
+		self.assertEqual(c.parse('\00\xff\00\x11'), 0xff0011)
+		self.assertEqual(c.parse('\xff\xff\xff\xff'), -1)
+		self.assertEqual(c.parse(c.build(0xff0011)),0xff0011)
 
 if __name__ == '__main__':
-	unittest.main()
+	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
+	unittest.TextTestRunner(verbosity=2).run(suite)
+
