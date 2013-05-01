@@ -59,6 +59,26 @@ def BigInteger(subconname, length_field = UBInt8("length")):
 		encoder = encode_big,
 		decoder = decode_big)
 
+def tag(obj,ctx):
+	mapping = {
+		AtomCacheReference : 82,
+		int : 98,
+		float : 70,
+		str : 100,
+		Reference : 114,
+		Port : 102,
+		Pid : 103,
+		tuple : 105,
+		etString : 107,
+		list : 108,
+		Binary : 109,
+		long : 111,
+		Fun : 112,
+		MFA : 113,
+		BitBinary : 77,	
+	}
+	return mapping[obj.__class__]
+
 atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		encoder = lambda obj,ctx: obj.index,
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
@@ -143,43 +163,39 @@ new_float = BFloat64("new_float")
 atom_utf8 = PascalString("atom_utf8", length_field = UBInt16("length"))
 small_atom_utf8 = PascalString("small_atom_utf8")
 
-term = ExprAdapter(Struct("term",
+term = ExprAdapter(Sequence("term",
 	UBInt8("tag"),
 	Switch("payload", lambda ctx: ctx.tag,
                 {
-			82: UBInt8("atom_cache_ref"),
-			97: UBInt8("small_integer"),
-			98: UBInt32("integer"),
-			99: ExprAdapter(String("float",31),
-				lambda obj, ctx: "%.20e" % obj,
-				lambda obj, ctx: float(obj)),
-			100: PascalString("atom", length_field = UBInt16("length")),
+			82: atom_cache_ref,
+			97: small_integer,
+			98: integer,
+			99: float_,
+			100: atom,
 			101: reference,
 			102: port,
 			103: pid,
-			104: TupleAdapter(PrefixedArray(LazyBound("small_tuple",lambda : term), length_field = UBInt8("arity"))),
-			105: TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term), length_field = UBInt32("arity"))),
-#			106: nil,
-			107: PascalString("string", length_field = UBInt16("length")),
-			108: PrefixedArray(LazyBound("list",lambda : term), length_field = UBInt32("arity")),
-			109: PascalString("binary", length_field = UBInt32("length")),
-			110: BigInteger("small_big", length_field = UBInt8("length")),
-			111: BigInteger("large_big", length_field = UBInt32("length")),
+			104: small_tuple,
+			105: large_tuple,
+			106: nil,
+			107: string,
+			108: list_,
+			109: binary,
+			110: small_big,
+			111: large_big,
 			114: new_reference,
-			115: PascalString("small_atom"),
+			115: small_atom,
 			117: fun,
 			112: new_fun,
 			113: export,
 			77: bit_binary,
-			70: BFloat64("new_float"),
-			118: PascalString("atom_utf8", length_field = UBInt16("length")),
-			119: PascalString("small_atom_utf8"),
-                },
-        ),
-	), 
-# FIXME: If we want to encode erlang data, we MUST put the tag code instead of zero here
-		lambda obj, ctx: (0, obj),
-		lambda obj, ctx: obj.payload
+			70: new_float,
+			118: atom_utf8,
+			119: small_atom_utf8,
+                },),
+	nested = False),
+		lambda obj, ctx: (tag(obj, ctx), obj),
+		lambda obj, ctx: obj[1]
 	)
 
 __all__ = ["term"]

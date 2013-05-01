@@ -67,10 +67,15 @@ class EETFConstructTest(unittest.TestCase):
                 self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_reference(self):
 		c = eetf_construct.reference
-		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), erlang_types.Reference("myatom",0x12,0x48))
+		r = erlang_types.Reference("myatom",0x12,0x48)
+		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), r)
+		self.assertEqual(c.parse(c.build(r)),r)
+		self.assertEqual(c.build(r),'\x64\x00\x06myatom\x00\x00\x00\x12\x48')
 	def test_new_reference(self):
 		c = eetf_construct.new_reference
-		self.assertEqual(c.parse('\x00\x02\x64\x00\x06myatom\x48\x00\x00\x00\x12\x00\x00\x00\x13'), erlang_types.Reference("myatom",[0x12,0x13],0x48))
+		r = erlang_types.Reference("myatom",[0x12,0x13],0x48)
+		self.assertEqual(c.parse('\x00\x02\x64\x00\x06myatom\x48\x00\x00\x00\x12\x00\x00\x00\x13'), r)
+		self.assertEqual(c.parse(c.build(r)),r)
 	def test_port(self):
 		c = eetf_construct.port
 		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), erlang_types.Port("myatom",0x12,0x48))
@@ -80,12 +85,16 @@ class EETFConstructTest(unittest.TestCase):
 	def test_small_typle(self):
 		c = eetf_construct.small_tuple
 		self.assertEqual(c.parse("\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
+		self.assertEqual(c.parse(c.build((1,2,'myatom'))),(1,2,'myatom'))
 	def test_large_typle(self):
 		c = eetf_construct.large_tuple
 		self.assertEqual(c.parse("\x00\x00\x00\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
+		self.assertEqual(c.parse(c.build((1,2,'myatom'))),(1,2,'myatom'))
 	def test_list(self):
 		c = eetf_construct.list_
 		self.assertEqual(c.parse('\x00\x00\x00\x02\x64\x00\x08YegorSaf\x64\x00\x0aRoBurToVoY'), ['YegorSaf','RoBurToVoY'])
+		self.assertEqual(c.parse(c.build([1,2,3,'OO'])),[1,2,3,'OO'])
+		self.assertEqual(c.parse(c.build(['Nu','poskoku'])),['Nu','poskoku'])
 	def test_nil(self):
 		c = eetf_construct.nil
 		self.assertEqual(c.parse('\x6a'), [])
@@ -119,7 +128,9 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse('\00\00\00\x02\x64\x00\x06myatom\x64\x00\x06myatom\x61\x13\x64\x00\x06myatom\x64\x00\x06myatom\x64\x00\x06myatom'), erlang_types.Fun(None,None,None,'myatom',0x13,'myatom','myatom',['myatom','myatom']))
 	def test_export(self):
 		c = eetf_construct.export
-		self.assertEqual(c.parse('\x64\x00\x06myatom\x64\x00\x06myat0m\x61\x13'),erlang_types.MFA('myatom','myat0m',0x13))
+		mfa = erlang_types.MFA('myatom','myat0m',0x13)
+		self.assertEqual(c.parse('\x64\x00\x06myatom\x64\x00\x06myat0m\x61\x13'),mfa)
+		self.assertEqual(c.parse(c.build(mfa)),mfa)
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
