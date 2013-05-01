@@ -46,7 +46,7 @@ class BeamFile(object):
 	def imports(self):
 		impt = self.selectChunkByName("ImpT")
 		atoms = self.atoms
-		return [(atoms[e.module], atoms[e.function], e.arity) for e in impt.payload.entry]
+		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.payload.entry]
 
 	@property
 	def attributes(self):
