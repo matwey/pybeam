@@ -22,7 +22,7 @@
 
 # External Term Format
 
-from erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary, Fun
+from erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary, Fun, MFA
 from construct import *
 
 class TupleAdapter(Adapter):
@@ -125,12 +125,13 @@ fun = ExprAdapter(Sequence("fun",
                 decoder = lambda obj,ctx: Fun(None, None, None, obj[2], obj[3], obj[4], obj[1], obj[5]))
 # new fun to be implemented later
 new_fun = fun
-
-export = Struct("export",
+export = ExprAdapter(Sequence("export",
 		LazyBound("Module", lambda : term),
 		LazyBound("Function", lambda : term),
 		LazyBound("Arity", lambda : term),
-	)
+		nested = False),
+		encoder = lambda obj,ctx: (obj.module, obj.function, obj.arity),
+		decoder = lambda obj,ctx: MFA(*obj))
 
 bit_binary = Struct("bit_binary",
 		UBInt32("Len"),

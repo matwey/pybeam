@@ -99,8 +99,9 @@ class EETFConstructTest(unittest.TestCase):
 	def test_fun(self):
 		c = eetf_construct.fun
 		self.assertEqual(c.parse('\00\00\00\x02\x64\x00\x06myatom\x64\x00\x06myatom\x61\x13\x64\x00\x06myatom\x64\x00\x06myatom\x64\x00\x06myatom'), erlang_types.Fun(None,None,None,'myatom',0x13,'myatom','myatom',['myatom','myatom']))
-
-
+	def test_export(self):
+		c = eetf_construct.export
+		self.assertEqual(c.parse('\x64\x00\x06myatom\x64\x00\x06myat0m\x61\x13'),erlang_types.MFA('myatom','myat0m',0x13))
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)

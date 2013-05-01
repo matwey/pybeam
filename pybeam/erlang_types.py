@@ -81,6 +81,8 @@ class MFA:
 		self.module = module
 		self.function = function
 		self.arity = arity
+	def __eq__(self, other):
+		return self.module == other.module and self.function == other.function and self.arity == other.arity
 
 class BitBinary:
 	def __init__(self, value, bits):
