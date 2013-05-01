@@ -88,4 +88,6 @@ class BitBinary:
 	def __init__(self, value, bits):
 		self.value = value
 		self.bits = bits
+	def __eq__(self, other):
+		return self.value == other.value and self.bits == other.bits
 

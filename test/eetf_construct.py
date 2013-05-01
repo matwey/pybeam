@@ -77,6 +77,11 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf_construct.nil
 		self.assertEqual(c.parse('\x6a'), [])
 		self.assertEqual(c.parse(c.build([])),[])
+	def test_bitbinary(self):
+		c = eetf_construct.bit_binary
+		self.assertEqual(c.parse('\00\00\00\x0a\x03RoBurToVoY'), erlang_types.BitBinary('RoBurToVoY',3))
+		s = erlang_types.BitBinary('RoBurToVoY',1)
+                self.assertEqual(c.parse(c.build(s)),s)
 	def test_string(self):
 		c = eetf_construct.string
 		self.assertEqual(c.parse('\x00\x0aRoBurToVoY'), erlang_types.String('RoBurToVoY'))
