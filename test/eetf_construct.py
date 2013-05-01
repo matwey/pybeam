@@ -48,6 +48,10 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf_construct.atom
 		self.assertEqual(c.parse('\x00\x06myatom'), 'myatom')
                 self.assertEqual(c.parse(c.build('robots')),'robots')
+	def test_small_atom(self):
+		c = eetf_construct.small_atom
+		self.assertEqual(c.parse('\x06myatom'), 'myatom')
+                self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_reference(self):
 		c = eetf_construct.reference
 		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x48'), erlang_types.Reference("myatom",0x12,0x48))

@@ -112,6 +112,7 @@ new_reference = ExprAdapter(Sequence("new_reference",
 		nested = False),
 		encoder = lambda obj,ctx: (len(obj.id), obj.node, obj.creation, obj.id),
 		decoder = lambda obj,ctx: Reference(obj[1], obj[3], obj[2]))
+small_atom = PascalString("small_atom")
 
 fun = Struct("fun",
 		UBInt32("NumFree"),
