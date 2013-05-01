@@ -84,7 +84,7 @@ chunk = Struct("chunk",
 			"LocT" : chunk_loct,
 #			"Trac" : chunk_trac,
 			},
-			default = String("skip", lambda ctx: ctx.size)
+			default = Bytes("skip", lambda ctx: ctx.size)
 		),
 		Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = "\00"),
 		nested = False,
