@@ -51,4 +51,5 @@ class BeamFile(object):
 	@property
 	def attributes(self):
 		attr = self.selectChunkByName("Attr")
-		return attr	
+		# convert from proplist to dict
+		return dict(attr.payload.term)
