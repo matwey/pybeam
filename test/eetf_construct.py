@@ -40,6 +40,10 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse('\00\xff\00\x11'), 0xff0011)
 		self.assertEqual(c.parse('\xff\xff\xff\xff'), -1)
 		self.assertEqual(c.parse(c.build(0xff0011)),0xff0011)
+	def test_float(self):
+		c = eetf_construct.float_
+		self.assertEqual(c.parse('     1.12344300000000002910e+04'), 11234.43)
+		self.assertEqual(c.parse(c.build(-3.1415926)),-3.1415926)
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)

@@ -30,6 +30,9 @@ atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
 small_integer = UBInt8("small_integer")
 integer = SBInt32("integer")
+float_ = ExprAdapter(String("float",31),
+		lambda obj,ctx: "%.20e    " % obj,
+		lambda obj,ctx: float(obj))
 
 class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
