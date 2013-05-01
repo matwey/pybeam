@@ -39,6 +39,8 @@ class Port:
 		self.node = node
 		self.id = id
 		self.creation = creation
+	def __eq__(self,other):
+		return self.node == other.node and self.id == other.id and self.creation == other.creation
 
 class Pid:
 	def __init__(self, node, id, serial, creation):
@@ -46,6 +48,8 @@ class Pid:
 		self.id = id
 		self.serial = serial
 		self.creation = creation
+	def __eq__(self,other):
+		return self.node == other.node and self.id == other.id and self.creation == other.creation and self.serial == other.serial
 
 class String:
 	def __init__(self, value):

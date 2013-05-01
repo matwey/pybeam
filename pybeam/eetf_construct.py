@@ -41,6 +41,21 @@ reference = ExprAdapter(Sequence("reference",
 		nested = False),
 		encoder = lambda obj,ctx: (obj.node, obj.id, obj.creation),
 		decoder = lambda obj,ctx: Reference(*obj))
+port = ExprAdapter(Sequence("port",
+		LazyBound("Node", lambda : term),
+		UBInt32("ID"),
+		UBInt8("Creation"),
+		nested = False),
+		encoder = lambda obj,ctx: (obj.node, obj.id, obj.creation),
+		decoder = lambda obj,ctx: Port(*obj))
+pid = ExprAdapter(Sequence("pid",
+		LazyBound("Node", lambda : term),
+		UBInt32("ID"),
+		UBInt32("Serial"),
+		UBInt8("Creation"),
+		nested = False),
+		encoder = lambda obj,ctx: (obj.node, obj.id, obj.serial, obj.creation),
+		decoder = lambda obj,ctx: Pid(*obj))
 
 class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
@@ -75,19 +90,6 @@ def BigInteger(subconname, length_field = UBInt8("length")):
 		nested = False),
 		encoder = encode_big,
 		decoder = decode_big
-	)
-
-port = Struct("port",
-		LazyBound("Node", lambda : term),
-		UBInt32("ID"),
-		UBInt8("Creation"),
-	)
-
-pid = Struct("pid",
-		LazyBound("Node", lambda : term),
-		UBInt32("ID"),
-		UBInt32("Serial"),
-		UBInt8("Creation"),
 	)
 
 new_reference = Struct("new_reference",
