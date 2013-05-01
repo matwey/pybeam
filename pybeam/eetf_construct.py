@@ -22,7 +22,13 @@
 
 # External Term Format
 
+from erlang_types import AtomCacheReference 
 from construct import *
+
+atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
+		encoder = lambda obj,ctx: Container(atom_cache_ref=obj.index),
+		decoder = lambda obj,ctx: AtomCacheReference(obj.atom_cache_ref))
+
 
 class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
