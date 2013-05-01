@@ -8,6 +8,7 @@ setup(name='pybeam',
       author_email='matwey.kornilov@gmail.com',
       license='MIT',
       packages=['pybeam'],
+      test_suite = 'test',
       install_requires=['construct'], 
       zip_safe=False)
 
