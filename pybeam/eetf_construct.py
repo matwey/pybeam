@@ -77,7 +77,10 @@ def tag(obj,ctx):
 		MFA : 113,
 		BitBinary : 77,	
 	}
-	return mapping[obj.__class__]
+	if obj == []:
+		return 106
+	else: 
+		return mapping[obj.__class__]
 
 atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		encoder = lambda obj,ctx: obj.index,
@@ -118,7 +121,14 @@ nil = ExprAdapter(Sequence("nil"),
 string = ExprAdapter(PascalString("string", length_field = UBInt16("length")),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: etString(obj))
-list_ = PrefixedArray(LazyBound("list",lambda : term), length_field = UBInt32("arity"))
+list_ = ExprAdapter(Sequence("list",
+		UBInt32("length"),
+		Array(lambda ctx: ctx.length, LazyBound("elements", lambda : term)),
+		LazyBound("tail", lambda : term),
+		nested = False
+		),
+		encoder = lambda obj,ctx: (len(obj), obj, []),
+		decoder = lambda obj,ctx: obj[1] + obj[2])
 binary = ExprAdapter(PascalString("binary", length_field = UBInt32("length")),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: Binary(obj))
