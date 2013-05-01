@@ -96,6 +96,7 @@ beam = Struct("beam",
 	UBInt32("size"),
 	Const(String('beam',4),'BEAM'),
 	GreedyRange(chunk),
+	Terminator,
 	)
 
 __all__ = ["beam"]
