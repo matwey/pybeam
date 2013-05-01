@@ -26,8 +26,8 @@ from erlang_types import AtomCacheReference
 from construct import *
 
 atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
-		encoder = lambda obj,ctx: Container(atom_cache_ref=obj.index),
-		decoder = lambda obj,ctx: AtomCacheReference(obj.atom_cache_ref))
+		encoder = lambda obj,ctx: obj.index,
+		decoder = lambda obj,ctx: AtomCacheReference(obj))
 small_integer = UBInt8("small_integer")
 integer = SBInt32("integer")
 

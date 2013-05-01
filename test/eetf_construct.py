@@ -29,8 +29,8 @@ class EETFConstructTest(unittest.TestCase):
 		pass
 	def test_atom_cache_ref(self):
 		c = eetf_construct.atom_cache_ref
-		self.assertEqual(c.parse('\123'), erlang_types.AtomCacheReference(123))
-		self.assertEqual(c.parse(c.build(erlang_types.AtomCacheReference(123))),erlang_types.AtomCacheReference(123))
+		self.assertEqual(c.parse('\x23'), erlang_types.AtomCacheReference(0x23))
+		self.assertEqual(c.parse(c.build(erlang_types.AtomCacheReference(0x23))),erlang_types.AtomCacheReference(0x23))
 	def test_small_integer(self):
 		c = eetf_construct.small_integer
 		self.assertEqual(c.parse('\x23'), 0x23)

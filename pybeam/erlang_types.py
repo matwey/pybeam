@@ -23,6 +23,8 @@
 class AtomCacheReference:
 	def __init__(self, index):
 		self.index = index
+	def __eq__(self,other):
+		return self.index == other.index
 
 class Reference:
 	def __init__(self, node, id, creation):
