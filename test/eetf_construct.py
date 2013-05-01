@@ -57,7 +57,12 @@ class EETFConstructTest(unittest.TestCase):
 	def test_pid(self):
 		c = eetf_construct.pid
 		self.assertEqual(c.parse('\x64\x00\x06myatom\x00\x00\x00\x12\x00\x00\x00\x32\x48'), erlang_types.Pid("myatom",0x12,0x32,0x48))
-	
+	def test_small_typle(self):
+		c = eetf_construct.small_tuple
+		self.assertEqual(c.parse("\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
+	def test_large_typle(self):
+		c = eetf_construct.large_tuple
+		self.assertEqual(c.parse("\x00\x00\x00\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
 
 
 if __name__ == '__main__':

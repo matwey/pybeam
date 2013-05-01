@@ -25,6 +25,13 @@
 from erlang_types import AtomCacheReference, Reference, Port, Pid
 from construct import *
 
+class TupleAdapter(Adapter):
+	def _decode(self, obj, ctx):
+# we got a list from construct and want to see a tuple
+		return tuple(obj)
+	def _encode(self, obj, ctv):
+		return list(obj)
+
 atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		encoder = lambda obj,ctx: obj.index,
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
@@ -56,13 +63,8 @@ pid = ExprAdapter(Sequence("pid",
 		nested = False),
 		encoder = lambda obj,ctx: (obj.node, obj.id, obj.serial, obj.creation),
 		decoder = lambda obj,ctx: Pid(*obj))
-
-class TupleAdapter(Adapter):
-	def _decode(self, obj, ctx):
-# we got a list from construct and want to see a tuple
-		return tuple(obj)
-	def _encode(self, obj, ctv):
-		return list(obj)
+small_tuple = TupleAdapter(PrefixedArray(LazyBound("small_tuple",lambda : term), length_field = UBInt8("arity")))
+large_tuple = TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term), length_field = UBInt32("arity")))
 
 def BigInteger(subconname, length_field = UBInt8("length")):
 	def decode_big(obj,ctx):
