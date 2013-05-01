@@ -40,7 +40,7 @@ class BeamFile(object):
 	def exports(self):
 		expt = self.selectChunkByName("ExpT")
 		atoms = self.atoms
-		return [(atoms[e.function], e.arity, e.label) for e in expt.payload.entry]
+		return [(atoms[e.function-1], e.arity, e.label) for e in expt.payload.entry]
 
 	@property
 	def imports(self):
