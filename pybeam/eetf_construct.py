@@ -22,7 +22,7 @@
 
 # External Term Format
 
-from erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary
+from erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary, Fun
 from construct import *
 
 class TupleAdapter(Adapter):
@@ -113,30 +113,18 @@ new_reference = ExprAdapter(Sequence("new_reference",
 		encoder = lambda obj,ctx: (len(obj.id), obj.node, obj.creation, obj.id),
 		decoder = lambda obj,ctx: Reference(obj[1], obj[3], obj[2]))
 small_atom = PascalString("small_atom")
-
-fun = Struct("fun",
+fun = ExprAdapter(Sequence("fun",
 		UBInt32("NumFree"),
 		LazyBound("Pid", lambda : term),
 		LazyBound("Module", lambda : term),
 		LazyBound("Index", lambda : term),
 		LazyBound("Uniq", lambda : term),
-		Array(lambda ctx: ctx.len, LazyBound("FreeVars", lambda : term)),
-	)
-
-
-new_fun = Struct("new_fun",
-		UBInt32("Size"),
-		UBInt8("Arity"),
-		String("Uniq",16),
-		UBInt32("Index"),
-		UBInt32("NumFree"),
-		LazyBound("Pid", lambda : term),
-		LazyBound("Module", lambda : term),
-		LazyBound("Index", lambda : term),
-		LazyBound("Uniq", lambda : term),
-		Array(lambda ctx: ctx.len, LazyBound("FreeVars", lambda : term)),
-	)
-
+		Array(lambda ctx: ctx.NumFree, LazyBound("FreeVars", lambda : term)),
+		nested = False),
+                encoder = lambda obj,ctx: (len(obj.free), obj.pid, obj.module, obj.oldindex, olj.olduniq, obj.free) ,
+                decoder = lambda obj,ctx: Fun(None, None, None, obj[2], obj[3], obj[4], obj[1], obj[5]))
+# new fun to be implemented later
+new_fun = fun
 
 export = Struct("export",
 		LazyBound("Module", lambda : term),

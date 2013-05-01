@@ -96,6 +96,9 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf_construct.large_big
 		self.assertEqual(c.parse('\x00\x00\x00\x02\x00\x02\x01'), 258)
 		self.assertEqual(c.parse(c.build(123456789123456789L)),123456789123456789L)
+	def test_fun(self):
+		c = eetf_construct.fun
+		self.assertEqual(c.parse('\00\00\00\x02\x64\x00\x06myatom\x64\x00\x06myatom\x61\x13\x64\x00\x06myatom\x64\x00\x06myatom\x64\x00\x06myatom'), erlang_types.Fun(None,None,None,'myatom',0x13,'myatom','myatom',['myatom','myatom']))
 
 
 
