@@ -63,6 +63,9 @@ class EETFConstructTest(unittest.TestCase):
 	def test_large_typle(self):
 		c = eetf_construct.large_tuple
 		self.assertEqual(c.parse("\x00\x00\x00\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
+	def test_list(self):
+		c = eetf_construct.list_
+		self.assertEqual(c.parse('\x00\x00\x00\x02\x64\x00\x08YegorSaf\x64\x00\x0aRoBurToVoY'), ['YegorSaf','RoBurToVoY'])
 	def test_nil(self):
 		c = eetf_construct.nil
 		self.assertEqual(c.parse('\x6a'), [])
