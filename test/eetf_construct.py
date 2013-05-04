@@ -43,6 +43,7 @@ class EETFConstructTest(unittest.TestCase):
 	def test_float(self):
 		c = eetf_construct.float_
 		self.assertEqual(c.parse('     1.12344300000000002910e+04'), 11234.43)
+		self.assertEqual(c.parse('1.00000000000000000000e+00\00\00\00\00\00'), 1.0)
 		self.assertEqual(c.parse(c.build(-3.1415926)),-3.1415926)
 	def test_new_float(self):
 		c = eetf_construct.new_float
