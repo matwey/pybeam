@@ -87,9 +87,9 @@ atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
 small_integer = UBInt8("small_integer")
 integer = SBInt32("integer")
-float_ = ExprAdapter(String("float",31),
+float_ = ExprAdapter(String("float",31,padchar='\00'),
 		encoder = lambda obj,ctx: "%.20e    " % obj,
-		decoder = lambda obj,ctx: float(obj))
+		decoder = lambda obj,ctx: float(obj.strip()))
 atom = PascalString("atom", length_field = UBInt16("length"))
 reference = ExprAdapter(Sequence("reference",
 		LazyBound("Node", lambda : term),
