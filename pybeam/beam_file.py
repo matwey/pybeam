@@ -37,6 +37,10 @@ class BeamFile(object):
 		return self.selectChunkByName("Atom").payload.atom
 
 	@property
+	def modulename(self):
+		return self.atoms[0]
+
+	@property
 	def exports(self):
 		expt = self.selectChunkByName("ExpT")
 		atoms = self.atoms
