@@ -48,6 +48,16 @@ chunk_impt = Struct("chunk_impt",
 	)
 	)
 
+chunk_code = Struct("chunk_code",
+	UBInt32("headerlen"),
+	UBInt32("set"),
+	UBInt32("opcode_max"),
+	UBInt32("labels"),
+	UBInt32("functions"),
+	Bytes("skip", lambda ctx: ctx.headerlen-16),
+	Bytes("code", lambda ctx: ctx._.size-ctx.headerlen-4),
+	)
+
 chunk_loct = Struct("chunk_loct",
 	UBInt32("len"),
 	Array(lambda ctx: ctx.len, Struct("entry",
@@ -77,7 +87,7 @@ chunk = Struct("chunk",
 			"Atom" : chunk_atom,
 			"ExpT" : chunk_expt,
 			"ImpT" : chunk_impt,
-#			"Code" : chunk_code,
+			"Code" : chunk_code,
 #			"StrT" : chunk_strt,
 			"Attr" : chunk_attr,
 			"CInf" : chunk_cinf,
