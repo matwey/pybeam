@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2013 Matwey V. Kornilov <matwey.kornilov@gmail.com>
+# Copyright (c) 2013 Fredrik Ahlberg <fredrik@z80.se>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +59,22 @@ chunk_code = Struct("chunk_code",
 	Bytes("code", lambda ctx: ctx._.size-ctx.headerlen-4),
 	)
 
+chunk_litt = Struct("chunk_litt",
+	UBInt32("len_uncompressed"),
+	TunnelAdapter(
+		String("data", length = lambda ctx: ctx._.size-4, encoding = "zlib"),
+		Struct("uncompressed",
+			UBInt32("len"),
+			Array(lambda ctx: ctx.len, Struct("entry",
+					UBInt32("len"),
+					Const(UBInt8("131"),131),
+					term
+				)
+			)
+		)
+	)
+	)
+
 chunk_loct = Struct("chunk_loct",
 	UBInt32("len"),
 	Array(lambda ctx: ctx.len, Struct("entry",
@@ -89,6 +106,7 @@ chunk = Struct("chunk",
 			"ImpT" : chunk_impt,
 			"Code" : chunk_code,
 #			"StrT" : chunk_strt,
+			"LitT" : chunk_litt,
 			"Attr" : chunk_attr,
 			"CInf" : chunk_cinf,
 			"LocT" : chunk_loct,
