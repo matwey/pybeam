@@ -98,26 +98,28 @@ chunk_loct = Struct("chunk_loct",
 chunk = Struct("chunk",
 	String("chunk_name",4),
 	UBInt32("size"),
-	SeqOfOne("payload",
-		Switch("payload", lambda ctx: ctx.chunk_name,
-			{
-#			"Abst" : chunk_abst,
-			"Atom" : chunk_atom,
-			"Attr" : chunk_attr,
-			"CInf" : chunk_cinf,
-			"Code" : chunk_code,
-			"ExpT" : chunk_expt,
-			"ImpT" : chunk_impt,
-			"LitT" : chunk_litt,
-			"LocT" : chunk_loct,
-#			"StrT" : chunk_strt,
-#			"Trac" : chunk_trac,
-			},
-			default = Bytes("skip", lambda ctx: ctx.size)
-		),
-		Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = "\00"),
-		nested = False,
-	)
+	If(lambda ctx: ctx.size > 0,
+		SeqOfOne("payload",
+			Switch("payload", lambda ctx: ctx.chunk_name,
+				{
+#				"Abst" : chunk_abst,
+				"Atom" : chunk_atom,
+				"Attr" : chunk_attr,
+				"CInf" : chunk_cinf,
+				"Code" : chunk_code,
+				"ExpT" : chunk_expt,
+				"ImpT" : chunk_impt,
+				"LitT" : chunk_litt,
+				"LocT" : chunk_loct,
+#				"StrT" : chunk_strt,
+#				"Trac" : chunk_trac,
+				},
+				default = Bytes("skip", lambda ctx: ctx.size)
+			),
+			Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = "\00"),
+			nested = False,
+		)
+		)
 	)
 
 beam = Struct("beam",
