@@ -58,6 +58,10 @@ class BeamFile(object):
 		return (code.set, code.opcode_max, code.labels, code.functions, code.code)
 
 	@property
+	def literals(self):
+		return [e.term for e in self.selectChunkByName("LitT").payload.data.entry]
+
+	@property
 	def attributes(self):
 		attr = self.selectChunkByName("Attr")
 		# convert from proplist to dict
