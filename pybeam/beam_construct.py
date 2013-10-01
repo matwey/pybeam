@@ -29,6 +29,26 @@ chunk_atom = Struct("chunk_atom",
 	Array(lambda ctx: ctx.len, PascalString("atom"))
 	)
 
+chunk_attr = Struct("chunk_attr",
+	Const(UBInt8("131"),131),
+	term
+	)
+
+chunk_cinf = Struct("chunk_cinf",
+	Const(UBInt8("131"),131),
+	term
+	)
+
+chunk_code = Struct("chunk_code",
+	UBInt32("headerlen"),
+	UBInt32("set"),
+	UBInt32("opcode_max"),
+	UBInt32("labels"),
+	UBInt32("functions"),
+	Bytes("skip", lambda ctx: ctx.headerlen-16),
+	Bytes("code", lambda ctx: ctx._.size-ctx.headerlen-4),
+	)
+
 chunk_expt = Struct("chunk_expt",
 	UBInt32("len"),
 	Array(lambda ctx: ctx.len, Struct("entry",
@@ -47,16 +67,6 @@ chunk_impt = Struct("chunk_impt",
 			UBInt32("arity"),
 		)
 	)
-	)
-
-chunk_code = Struct("chunk_code",
-	UBInt32("headerlen"),
-	UBInt32("set"),
-	UBInt32("opcode_max"),
-	UBInt32("labels"),
-	UBInt32("functions"),
-	Bytes("skip", lambda ctx: ctx.headerlen-16),
-	Bytes("code", lambda ctx: ctx._.size-ctx.headerlen-4),
 	)
 
 chunk_litt = Struct("chunk_litt",
@@ -85,31 +95,22 @@ chunk_loct = Struct("chunk_loct",
 	)
 	)
 
-chunk_attr = Struct("chunk_attr",
-	Const(UBInt8("131"),131),
-	term
-	)
-
-chunk_cinf = Struct("chunk_cinf",
-	Const(UBInt8("131"),131),
-	term
-	)
-
 chunk = Struct("chunk",
 	String("chunk_name",4),
 	UBInt32("size"),
 	SeqOfOne("payload",
 		Switch("payload", lambda ctx: ctx.chunk_name,
 			{
+#			"Abst" : chunk_abst,
 			"Atom" : chunk_atom,
-			"ExpT" : chunk_expt,
-			"ImpT" : chunk_impt,
-			"Code" : chunk_code,
-#			"StrT" : chunk_strt,
-			"LitT" : chunk_litt,
 			"Attr" : chunk_attr,
 			"CInf" : chunk_cinf,
+			"Code" : chunk_code,
+			"ExpT" : chunk_expt,
+			"ImpT" : chunk_impt,
+			"LitT" : chunk_litt,
 			"LocT" : chunk_loct,
+#			"StrT" : chunk_strt,
 #			"Trac" : chunk_trac,
 			},
 			default = Bytes("skip", lambda ctx: ctx.size)

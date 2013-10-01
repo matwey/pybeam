@@ -37,8 +37,20 @@ class BeamFile(object):
 		return self.selectChunkByName("Atom").payload.atom
 
 	@property
-	def modulename(self):
-		return self.atoms[0]
+	def attributes(self):
+		attr = self.selectChunkByName("Attr")
+		# convert from proplist to dict
+		return dict(attr.payload.term)
+
+	@property
+	def code(self):
+		code = self.selectChunkByName("Code").payload
+		return (code.set, code.opcode_max, code.labels, code.functions, code.code)
+
+	@property
+	def compileinfo(self):
+		cinf = self.selectChunkByName("CInf")
+		return dict(cinf.payload.term)
 
 	@property
 	def exports(self):
@@ -53,17 +65,5 @@ class BeamFile(object):
 		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.payload.entry]
 
 	@property
-	def code(self):
-		code = self.selectChunkByName("Code").payload
-		return (code.set, code.opcode_max, code.labels, code.functions, code.code)
-
-	@property
-	def attributes(self):
-		attr = self.selectChunkByName("Attr")
-		# convert from proplist to dict
-		return dict(attr.payload.term)
-	
-	@property
-	def compileinfo(self):
-		cinf = self.selectChunkByName("CInf")
-		return dict(cinf.payload.term)
+	def modulename(self):
+		return self.atoms[0]
