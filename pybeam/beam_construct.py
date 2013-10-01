@@ -95,6 +95,12 @@ chunk_loct = Struct("chunk_loct",
 	)
 	)
 
+chunk_strt = Struct("chunk_strt",
+	UBInt32("len"),
+	Array(lambda ctx: ctx.len, CString("string"))
+	)
+
+
 chunk = Struct("chunk",
 	String("chunk_name",4),
 	UBInt32("size"),
@@ -111,7 +117,7 @@ chunk = Struct("chunk",
 				"ImpT" : chunk_impt,
 				"LitT" : chunk_litt,
 				"LocT" : chunk_loct,
-#				"StrT" : chunk_strt,
+				"StrT" : chunk_strt,
 #				"Trac" : chunk_trac,
 				},
 				default = Bytes("skip", lambda ctx: ctx.size)
