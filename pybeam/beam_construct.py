@@ -124,7 +124,8 @@ chunk = Struct("chunk",
 			),
 			Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = "\00"),
 			nested = False,
-		)
+		),
+		[]
 		)
 	)
 
