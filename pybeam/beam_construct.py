@@ -24,7 +24,7 @@
 from construct import *
 from eetf_construct import term
 
-ERL_VERSION_MAGIC = 131
+erl_version_magic = Magic('\x83')
 
 chunk_atom = Struct("chunk_atom",
 	UBInt32("len"),
@@ -32,12 +32,12 @@ chunk_atom = Struct("chunk_atom",
 	)
 
 chunk_attr = Struct("chunk_attr",
-	Const(UBInt8("ERL_VERSION_MAGIC"),ERL_VERSION_MAGIC),
+	erl_version_magic,
 	term
 	)
 
 chunk_cinf = Struct("chunk_cinf",
-	Const(UBInt8("ERL_VERSION_MAGIC"),ERL_VERSION_MAGIC),
+	erl_version_magic,
 	term
 	)
 
@@ -79,7 +79,7 @@ chunk_litt = Struct("chunk_litt",
 			UBInt32("len"),
 			Array(lambda ctx: ctx.len, Struct("entry",
 					UBInt32("len"),
-					Const(UBInt8("ERL_VERSION_MAGIC"),ERL_VERSION_MAGIC),
+					erl_version_magic,
 					term
 				)
 			)
