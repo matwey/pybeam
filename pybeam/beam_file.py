@@ -59,6 +59,10 @@ class BeamFile(object):
 		return [(atoms[e.function-1], e.arity, e.label) for e in expt.payload.entry]
 
 	@property
+	def literals(self):
+		return [e.term for e in self.selectChunkByName("LitT").payload.data.entry]
+
+	@property
 	def imports(self):
 		impt = self.selectChunkByName("ImpT")
 		atoms = self.atoms
@@ -67,8 +71,3 @@ class BeamFile(object):
 	@property
 	def modulename(self):
 		return self.atoms[0]
-
-	@property
-	def strings(self):
-		strt = self.selectChunkByName("StrT")
-		return strt.payload
