@@ -31,6 +31,9 @@ class BEAMConstructTest(unittest.TestCase):
 		c = beam_construct.erl_version_magic
 		self.assertEqual(c.parse('\x83'), '\x83')
 		self.assertRaises(ConstError, c.parse, '\x84')
+	def test_beam(self):
+		c = beam_construct.beam
+		self.assertEqual(c.parse('FOR1\x00\x00\x00\x00BEAM'), Container(for1="FOR1", beam="BEAM", chunk=[], size=0))
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(BEAMConstructTest)

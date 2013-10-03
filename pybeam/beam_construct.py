@@ -137,7 +137,7 @@ beam = Struct("beam",
 	Const(String('for1',4),'FOR1'),
 	UBInt32("size"),
 	Const(String('beam',4),'BEAM'),
-	GreedyRange(chunk),
+	OptionalGreedyRange(chunk),
 	Terminator,
 	)
 
