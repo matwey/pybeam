@@ -34,6 +34,14 @@ class BEAMConstructTest(unittest.TestCase):
 	def test_beam(self):
 		c = beam_construct.beam
 		self.assertEqual(c.parse('FOR1\x00\x00\x00\x00BEAM'), Container(for1="FOR1", beam="BEAM", chunk=[], size=0))
+	def test_chunk_atom(self):
+		c = beam_construct.chunk_atom
+		self.assertEqual(c.parse('\x00\x00\x00\x00'), Container(len=0, atom=[]))
+		self.assertEqual(c.parse('\x00\x00\x00\x01\x08burtovoy'), Container(len=1, atom=["burtovoy"]))
+		self.assertEqual(c.parse(c.build(Container(len=0, atom=[]))), Container(len=0, atom=[]))
+		self.assertEqual(c.parse(c.build(Container(len=1, atom=["burtovoy"]))), Container(len=1, atom=["burtovoy"]))
+		self.assertRaises(ArrayError, c.build, Container(len=2, atom=[]))
+		self.assertRaises(ArrayError, c.parse, '\x00\x00\xff\x00')
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(BEAMConstructTest)
