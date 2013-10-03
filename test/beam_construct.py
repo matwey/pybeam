@@ -42,6 +42,11 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build(Container(len=1, atom=["burtovoy"]))), Container(len=1, atom=["burtovoy"]))
 		self.assertRaises(ArrayError, c.build, Container(len=2, atom=[]))
 		self.assertRaises(ArrayError, c.parse, '\x00\x00\xff\x00')
+	def test_chunk_attr(self):
+		c = beam_construct.chunk_attr
+		self.assertEqual(c.parse('\x83\x64\x00\x08burtovoy'), Container(term="burtovoy"))
+		self.assertEqual(c.parse(c.build(Container(term="burtovoy"))), Container(term="burtovoy"))
+		self.assertEqual(c.parse('\x83\x6a'), Container(term=[]))
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(BEAMConstructTest)
