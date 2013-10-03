@@ -208,6 +208,10 @@ term = ExprAdapter(Sequence("term",
 		lambda obj, ctx: obj[1]
 	)
 
-__all__ = ["term"]
+erl_version_magic = Magic('\x83')
+
+external_term = SeqOfOne("external_term",erl_version_magic,term)
+
+__all__ = ["term", "external_term"]
 
 

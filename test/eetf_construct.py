@@ -135,6 +135,12 @@ class EETFConstructTest(unittest.TestCase):
 		mfa = erlang_types.MFA('myatom','myat0m',0x13)
 		self.assertEqual(c.parse('\x64\x00\x06myatom\x64\x00\x06myat0m\x61\x13'),mfa)
 		self.assertEqual(c.parse(c.build(mfa)),mfa)
+	def test_external(self):
+		c = eetf_construct.external_term
+		self.assertEqual(c.parse('\x83\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
+		self.assertEqual(c.parse(c.build(258)), 258)
+		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
+		self.assertEqual(c.build('BurToVoY'), '\x83\x64\x00\x08BurToVoY')
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
