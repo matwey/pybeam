@@ -53,6 +53,11 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse('\x00\x00\x00\x08burtovoy'), Container(string='burtovoy'))
 		self.assertEqual(c.parse(c.build(Container(string=''))), Container(string=''))
 		self.assertEqual(c.parse(c.build(Container(string='burtovoy'))), Container(string='burtovoy'))
+	def test_chunk_cinf(self):
+		c = beam_construct.chunk_cinf
+		self.assertEqual(c.parse('\x83\x64\x00\x08burtovoy'), Container(term="burtovoy"))
+		self.assertEqual(c.parse(c.build(Container(term="burtovoy"))), Container(term="burtovoy"))
+		self.assertEqual(c.parse('\x83\x6a'), Container(term=[]))
 
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(BEAMConstructTest)
