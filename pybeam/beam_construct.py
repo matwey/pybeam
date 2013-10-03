@@ -27,8 +27,7 @@ from eetf_construct import term
 erl_version_magic = Magic('\x83')
 
 chunk_atom = Struct("chunk_atom",
-	UBInt32("len"),
-	Array(lambda ctx: ctx.len, PascalString("atom"))
+	PrefixedArray(PascalString("atom"), length_field = UBInt32("len"))
 	)
 
 chunk_attr = Struct("chunk_attr",
