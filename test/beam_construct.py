@@ -36,12 +36,12 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse('FOR1\x00\x00\x00\x00BEAM'), Container(for1="FOR1", beam="BEAM", chunk=[], size=0))
 	def test_chunk_atom(self):
 		c = beam_construct.chunk_atom
-		self.assertEqual(c.parse('\x00\x00\x00\x00'), Container(atom=[]))
-		self.assertEqual(c.parse('\x00\x00\x00\x01\x08burtovoy'), Container(atom=["burtovoy"]))
-		self.assertEqual(c.parse('\x00\x00\x00\x02\x08burtovoy\x08yegorsaf'), Container(atom=["burtovoy","yegorsaf"]))
-		self.assertEqual(c.parse(c.build(Container(atom=[]))), Container(atom=[]))
-		self.assertEqual(c.parse(c.build(Container(atom=["burtovoy"]))), Container(atom=["burtovoy"]))
-		self.assertEqual(c.parse(c.build(Container(atom=["burtovoy","yegorsaf"]))), Container(atom=["burtovoy","yegorsaf"]))
+		self.assertEqual(c.parse('\x00\x00\x00\x00'), [])
+		self.assertEqual(c.parse('\x00\x00\x00\x01\x08burtovoy'),["burtovoy"])
+		self.assertEqual(c.parse('\x00\x00\x00\x02\x08burtovoy\x08yegorsaf'), ["burtovoy","yegorsaf"])
+		self.assertEqual(c.parse(c.build([])), [])
+		self.assertEqual(c.parse(c.build(["burtovoy"])), ["burtovoy"])
+		self.assertEqual(c.parse(c.build(["burtovoy","yegorsaf"])), ["burtovoy","yegorsaf"])
 		self.assertRaises(ArrayError, c.parse, '\x00\x00\xff\x00')
 	def test_chunk_attr(self):
 		c = beam_construct.chunk_attr

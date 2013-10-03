@@ -34,7 +34,7 @@ class BeamFile(object):
 
 	@property
 	def atoms(self):
-		return self.selectChunkByName("Atom").payload.atom
+		return self.selectChunkByName("Atom").payload
 
 	@property
 	def attributes(self):
