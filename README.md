@@ -13,3 +13,9 @@ print p.imports
 print p.exports
 print p.atoms
 ```
+
+## References
+* [Erlang BEAM file format](http://www.erlang.se/~bjorn/beam_file_format.html)
+* [Erlang external term format](http://erlang.org/doc/apps/erts/erl_ext_dist.html)
+* [BEAM file format](http://synrc.com/publications/cat/Functional%20Languages/Erlang/BEAM.pdf)
+
