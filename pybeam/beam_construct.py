@@ -22,7 +22,7 @@
 #
 
 from construct import *
-from eetf_construct import term
+from eetf_construct import term, external_term
 
 erl_version_magic = Magic('\x83')
 
@@ -30,15 +30,9 @@ chunk_atom = Struct("chunk_atom",
 	PrefixedArray(PascalString("atom"), length_field = UBInt32("len"))
 	)
 
-chunk_attr = Struct("chunk_attr",
-	erl_version_magic,
-	term
-	)
+chunk_attr = Rename("chunk_attr", external_term)
 
-chunk_cinf = Struct("chunk_cinf",
-	erl_version_magic,
-	term
-	)
+chunk_cinf = Rename("chunk_cinf", external_term)
 
 chunk_code = Struct("chunk_code",
 	UBInt32("headerlen"),

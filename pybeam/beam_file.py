@@ -40,7 +40,7 @@ class BeamFile(object):
 	def attributes(self):
 		attr = self.selectChunkByName("Attr")
 		# convert from proplist to dict
-		return dict(attr.payload.term)
+		return dict(attr.payload)
 
 	@property
 	def code(self):
@@ -50,7 +50,7 @@ class BeamFile(object):
 	@property
 	def compileinfo(self):
 		cinf = self.selectChunkByName("CInf")
-		return dict(cinf.payload.term)
+		return dict(cinf.payload)
 
 	@property
 	def exports(self):
