@@ -47,7 +47,7 @@ class Binary:
 	def __eq__(self, other):
 		return self._value == other.value
 	def __repr__(self):
-		return "<<%s>>" % self._value
+		return "<<"+','.join(map(lambda x: str(ord(x)), self.value))+">>"
 
 	@property
 	def value(self):
