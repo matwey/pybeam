@@ -23,13 +23,20 @@
 from construct import *
 from opcodes import *
 
+def decode_bigint(obj, ctx):
+	v = int(obj[1:].encode('hex'), 16)
+	if ord(obj[1]) > 0x80:
+		return v-(1 << (len(obj)-1)*8) 
+	else:
+		return v
+
 beam_integer = IfThenElse("value", lambda ctx: ctx.tag & 0x08 == 0,
 	ExprAdapter(UBInt8("b"),
 		decoder = lambda obj, ctx: obj >> 4,
 		encoder = None),
 	IfThenElse("value", lambda ctx: ctx.tag & 0x10 == 0,
 		ExprAdapter(UBInt16("w"), decoder = lambda obj, ctx: ((obj & 0xe000)>>5)|(obj & 0xff), encoder = None),
-		String("s", length = lambda ctx: 2+(ctx.tag >> 5))
+		ExprAdapter(String("s", length = lambda ctx: 3+(ctx.tag >> 5)), decoder = decode_bigint, encoder = None)
 		)
 	)
 
