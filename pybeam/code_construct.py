@@ -76,6 +76,10 @@ beam_alloclist = Struct("s",
 		),
 	)
 
+beam_floatlit = Struct("s",
+	UBInt8("dummy"),
+	BFloat64("value"))
+
 beam_floatreg = Struct("s",
 	UBInt8("dummy_tag"),
 	Peek(UBInt8("tag")),
@@ -89,7 +93,7 @@ beam_literal = Struct("s",
 beam_extended = ExprAdapter(
 	Switch("payload", lambda ctx: ctx.type,
 		{
-			#TAGX_FLOATLIT:
+			TAGX_FLOATLIT: beam_floatlit,
 			TAGX_SELECTLIST: beam_selectlist,
 			TAGX_FLOATREG: beam_floatreg,
 			TAGX_ALLOCLIST: beam_alloclist,
