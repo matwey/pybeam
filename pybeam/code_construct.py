@@ -21,31 +21,54 @@
 #
 
 from construct import *
+from construct.core import _read_stream
 from opcodes import *
 
-def decode_bigint(obj, ctx):
-	v = int(obj[1:].encode('hex'), 16)
-	if ord(obj[1]) > 0x80:
-		return v-(1 << (len(obj)-1)*8) 
-	else:
-		return v
+class BeamInteger(Construct):
 
-beam_integer = IfThenElse("value", lambda ctx: ctx.tag & 0x08 == 0,
-	ExprAdapter(UBInt8("b"),
-		decoder = lambda obj, ctx: obj >> 4,
-		encoder = None),
-	IfThenElse("value", lambda ctx: ctx.tag & 0x10 == 0,
-		ExprAdapter(UBInt16("w"), decoder = lambda obj, ctx: ((obj & 0xe000)>>5)|(obj & 0xff), encoder = None),
-		ExprAdapter(String("s", length = lambda ctx: 3+(ctx.tag >> 5)), decoder = decode_bigint, encoder = None)
-		)
-	)
+	def _decode_bigint(self, s):
+		v = int(s.encode("hex"), 16)
+		if ord(s[0]) > 0x80:
+			return v-(1 << (len(s))*8) 
+		else:
+			return v
+
+	def __init__(self, name):
+		Construct.__init__(self, name)
+
+	def _parse(self, stream, context):
+		tag = ord(_read_stream(stream, 1))
+
+		# single byte or longer?
+		if tag & 0x08:
+			# 11 bits or longer?
+			if tag & 0x10:
+				# longer. 3-bit length or longer?
+				if tag & 0xe0 == 0xe0:
+					# long length!
+					length = self._parse(stream, context) + (tag >> 5) + 2
+					return self._decode_bigint(_read_stream(stream, length))
+				else:
+					# 3-bit length
+					return self._decode_bigint(_read_stream(stream, 2+(tag >> 5)))
+			else:
+				# 11 bits
+				w = ord(_read_stream(stream, 1))
+				return ((tag & 0xe0)<<3)|w
+		else:
+			# four bits
+			return tag >> 4
+
+	def _build(self, obj, stream, context):
+		pass
+
+	def _sizeof(self, context):
+		raise SizeofError("Can't calculate size")
 
 beam_selectlist = Struct("s",
 	UBInt8("dummy_tag"),
-	Struct("length",
-		Peek(UBInt8("tag")),
-		beam_integer),
-	Array(lambda ctx: ctx.length.value / 2,
+	BeamInteger("length"),
+	Array(lambda ctx: ctx.length / 2,
 		ExprAdapter(Struct("value",
 				LazyBound("op", lambda : beam_operand),
 				LazyBound("label", lambda : beam_operand)
@@ -58,17 +81,15 @@ beam_selectlist = Struct("s",
 
 beam_alloclist = Struct("s",
 	UBInt8("dummy_tag"),
-	Struct("length",
-		Peek(UBInt8("tag")),
-		beam_integer),
-	Array(lambda ctx: ctx.length.value,
+	BeamInteger("length"),
+	Array(lambda ctx: ctx.length,
 		ExprAdapter(Struct("value",
 			Struct("a",
 				Peek(UBInt8("tag")),
-				beam_integer),
+				BeamInteger("value")),
 			Struct("b",
 				Peek(UBInt8("tag")),
-				beam_integer),
+				BeamInteger("value")),
 			),
 			encoder = None,
 			decoder = lambda obj,ctx: (obj.a, obj.b),
@@ -83,12 +104,12 @@ beam_floatlit = Struct("s",
 beam_floatreg = Struct("s",
 	UBInt8("dummy_tag"),
 	Peek(UBInt8("tag")),
-	beam_integer)
+	BeamInteger("value"))
 
 beam_literal = Struct("s",
 	UBInt8("dummy_tag"),
 	Peek(UBInt8("tag")),
-	beam_integer)
+	BeamInteger("value"))
 
 beam_extended = ExprAdapter(
 	Switch("payload", lambda ctx: ctx.type,
@@ -109,7 +130,7 @@ beam_operand = ExprAdapter(
 		Value("type", lambda ctx: (ctx.tag >> 4)+TAGX_BASE if ctx.tag & 0x07 == TAG_EXTENDED else ctx.tag & 0x07),
 		IfThenElse("value", lambda ctx: ctx.type >= TAGX_BASE,
 			beam_extended,
-			beam_integer
+			BeamInteger("value")
 			)
 		),
 	encoder = None,

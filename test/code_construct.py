@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-from pybeam.code_construct import beam_operand
+from pybeam.code_construct import beam_operand, beam_instruction
 from pybeam.opcodes import *
 from construct import *
 import unittest
@@ -33,6 +33,17 @@ class CodeConstructTest(unittest.TestCase):
         self.assertEqual(beam_operand.parse('\x59\x00\xff\xff\xff'), (TAG_INTEGER, 16777215))
         self.assertEqual(beam_operand.parse('\x99\x00\xe8\xd4\xa5\x10\x00'), (TAG_INTEGER, 1e12))
         self.assertEqual(beam_operand.parse('\x99\xff\x17\x2b\x5a\xf0\x00'), (TAG_INTEGER, -1e12))
+        self.assertEqual(beam_operand.parse('\x0d\xb0'), (TAG_LABEL, 176))
+        self.assertEqual(beam_operand.parse('\xf9\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff'), (TAG_INTEGER, 0xffffffffffffffff))
+        self.assertEqual(beam_operand.parse('\xf9\x00\xff\x00\x00\x00\x00\x00\x00\x00\x01'), (TAG_INTEGER, -0xffffffffffffffff))
+
+    def test_instruction(self):
+        # op = 0x28 = IS_GE
+        #  1 = 0x0d, 0xb0 = L176
+        #  2 = 0xf9, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff = Int 0xffffffffffffffff
+        #  3 = 0x63 = X(6)
+        self.assertEqual(beam_instruction.parse('\x28\x0d\xb0\xf9\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x63'),
+                (IS_GE, [(TAG_LABEL, 176), (TAG_INTEGER, 0xffffffffffffffff), (TAG_XREG, 6)]))
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(CodeConstructTest)
