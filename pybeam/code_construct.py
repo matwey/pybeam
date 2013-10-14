@@ -84,15 +84,11 @@ beam_alloclist = Struct("s",
 	BeamInteger("length"),
 	Array(lambda ctx: ctx.length,
 		ExprAdapter(Struct("value",
-			Struct("a",
-				Peek(UBInt8("tag")),
-				BeamInteger("value")),
-			Struct("b",
-				Peek(UBInt8("tag")),
-				BeamInteger("value")),
+				BeamInteger("type"),
+				BeamInteger("count")
 			),
 			encoder = None,
-			decoder = lambda obj,ctx: (obj.a, obj.b),
+			decoder = lambda obj,ctx: (obj.type, obj.count),
 			)
 		),
 	)

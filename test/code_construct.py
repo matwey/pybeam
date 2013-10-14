@@ -45,6 +45,15 @@ class CodeConstructTest(unittest.TestCase):
         self.assertEqual(beam_instruction.parse('\x28\x0d\xb0\xf9\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\x63'),
                 (IS_GE, [(TAG_LABEL, 176), (TAG_INTEGER, 0xffffffffffffffff), (TAG_XREG, 6)]))
 
+        # op = 0x10 = TEST_HEAP
+        #  1 = 0x37 (ALLOC_LIST)
+        #      0x20 -> length = 2
+        #       0x00 0x00 -> words: 0
+        #       0x10 0x10 -> floats: 1
+        #  2 = 0x10 -> 1
+        self.assertEqual(beam_instruction.parse('\x10\x37\x20\x00\x00\x10\x10\x10'),
+                (TEST_HEAP, [(TAGX_ALLOCLIST, [(0, 0), (1, 1)]), (TAG_LITERAL, 1)]))
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(CodeConstructTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
