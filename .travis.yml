@@ -9,6 +9,4 @@ install:
   - "pip install construct"
 # command to run tests
 script:
-  - "python -m unittest test.beam_construct"
-  - "python -m unittest test.eetf_construct"
-
+  - "python -m unittest test"

@@ -59,6 +59,3 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), "burtovoy")
 		self.assertEqual(c.parse(c.build("burtovoy")), "burtovoy")
 		self.assertEqual(c.parse(b'\x83\x6a'), [])
-
-if __name__ == 'main':
-	unittest.main(verbosity=2)
