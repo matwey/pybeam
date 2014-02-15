@@ -24,7 +24,7 @@ from pybeam.beam_construct import beam
 
 class BeamFile(object):
 	def __init__(self, filename):
-		self._tree = beam.parse(file(filename,"r").read())
+		self._tree = beam.parse(open(filename,"rb").read())
 
 	def selectChunkByName(self, name):
 		for c in self._tree.chunk:
