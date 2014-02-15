@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-from beam_construct import beam
+from pybeam.beam_construct import beam
 
 class BeamFile(object):
 	def __init__(self, filename):

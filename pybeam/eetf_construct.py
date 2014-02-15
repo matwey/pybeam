@@ -22,7 +22,7 @@
 
 # External Term Format
 
-from erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary, Fun, MFA, BitBinary
+from pybeam.erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary, Fun, MFA, BitBinary
 from construct import *
 
 class TupleAdapter(Adapter):

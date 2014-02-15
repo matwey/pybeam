@@ -22,7 +22,7 @@
 #
 
 from construct import *
-from eetf_construct import term, external_term
+from pybeam.eetf_construct import term, external_term
 
 erl_version_magic = Magic('\x83')
 
