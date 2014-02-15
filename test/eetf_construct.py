@@ -142,7 +142,5 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
 		self.assertEqual(c.build('BurToVoY'), b'\x83\x64\x00\x08BurToVoY')
 
-if __name__ == '__main__':
-	suite = unittest.TestLoader().loadTestsFromTestCase(EETFConstructTest)
-	unittest.TextTestRunner(verbosity=2).run(suite)
-
+if __name__ == 'main':
+	unittest.main(verbosity=2)

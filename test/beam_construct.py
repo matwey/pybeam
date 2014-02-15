@@ -60,7 +60,5 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build("burtovoy")), "burtovoy")
 		self.assertEqual(c.parse(b'\x83\x6a'), [])
 
-if __name__ == '__main__':
-	suite = unittest.TestLoader().loadTestsFromTestCase(BEAMConstructTest)
-	unittest.TextTestRunner(verbosity=2).run(suite)
-
+if __name__ == 'main':
+	unittest.main(verbosity=2)
