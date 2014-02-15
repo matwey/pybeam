@@ -24,6 +24,10 @@
 
 from pybeam.erlang_types import AtomCacheReference, Reference, Port, Pid, String as etString, Binary, Fun, MFA, BitBinary
 from construct import *
+import sys
+
+if sys.version > '3':
+	long = int
 
 class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
@@ -87,10 +91,10 @@ atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
 small_integer = UBInt8("small_integer")
 integer = SBInt32("integer")
-float_ = ExprAdapter(String("float",31,padchar='\00'),
+float_ = ExprAdapter(String("float",31,padchar='\00',encoding="latin1"),
 		encoder = lambda obj,ctx: "%.20e    " % obj,
 		decoder = lambda obj,ctx: float(obj.strip()))
-atom = PascalString("atom", length_field = UBInt16("length"))
+atom = PascalString("atom", length_field = UBInt16("length"), encoding="latin1")
 reference = ExprAdapter(Sequence("reference",
 		LazyBound("Node", lambda : term),
 		UBInt32("ID"),
@@ -118,7 +122,7 @@ large_tuple = TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term),
 nil = ExprAdapter(Sequence("nil"),
 		encoder = lambda obj,ctx: (),
 		decoder = lambda obj,ctx: [])
-string = ExprAdapter(PascalString("string", length_field = UBInt16("length")),
+string = ExprAdapter(PascalString("string", length_field = UBInt16("length"), encoding="utf8"),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: etString(obj))
 list_ = ExprAdapter(Sequence("list",
@@ -142,7 +146,7 @@ new_reference = ExprAdapter(Sequence("new_reference",
 		nested = False),
 		encoder = lambda obj,ctx: (len(obj.id), obj.node, obj.creation, obj.id),
 		decoder = lambda obj,ctx: Reference(obj[1], obj[3], obj[2]))
-small_atom = PascalString("small_atom")
+small_atom = PascalString("small_atom", encoding="latin1")
 fun = ExprAdapter(Sequence("fun",
 		UBInt32("NumFree"),
 		LazyBound("Pid", lambda : term),
@@ -170,8 +174,8 @@ bit_binary = ExprAdapter(Sequence("bit_binary",
 		encoder = lambda obj,ctx: (len(obj.value), obj.bits, obj.value),
 		decoder = lambda obj,ctx: BitBinary(obj[2],obj[1]))
 new_float = BFloat64("new_float")
-atom_utf8 = PascalString("atom_utf8", length_field = UBInt16("length"))
-small_atom_utf8 = PascalString("small_atom_utf8")
+atom_utf8 = PascalString("atom_utf8", length_field = UBInt16("length"), encoding="utf8")
+small_atom_utf8 = PascalString("small_atom_utf8", encoding="utf8")
 
 term = ExprAdapter(Sequence("term",
 	UBInt8("tag"),
@@ -208,7 +212,7 @@ term = ExprAdapter(Sequence("term",
 		lambda obj, ctx: obj[1]
 	)
 
-erl_version_magic = Magic('\x83')
+erl_version_magic = Magic(b'\x83')
 
 external_term = SeqOfOne("external_term",erl_version_magic,term)
 
