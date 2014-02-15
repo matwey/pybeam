@@ -24,9 +24,9 @@
 from construct import *
 from pybeam.eetf_construct import term, external_term
 
-erl_version_magic = Magic('\x83')
+erl_version_magic = Magic(b'\x83')
 
-chunk_atom = Rename("chunk_atom", PrefixedArray(PascalString("atom"), length_field = UBInt32("len")))
+chunk_atom = Rename("chunk_atom", PrefixedArray(PascalString("atom", encoding="latin1"), length_field = UBInt32("len")))
 
 chunk_attr = Rename("chunk_attr", external_term)
 
@@ -89,7 +89,7 @@ chunk_loct = Struct("chunk_loct",
 	)
 
 chunk_strt = Struct("chunk_strt",
-	PascalString("string", length_field = UBInt32("len"))
+	PascalString("string", length_field = UBInt32("len"), encoding="latin1")
 	)
 
 chunk = Struct("chunk",
@@ -100,16 +100,16 @@ chunk = Struct("chunk",
 			Switch("payload", lambda ctx: ctx.chunk_name,
 				{
 #				"Abst" : chunk_abst,
-				"Atom" : chunk_atom,
-				"Attr" : chunk_attr,
-				"CInf" : chunk_cinf,
-				"Code" : chunk_code,
-				"ExpT" : chunk_expt,
+				b"Atom" : chunk_atom,
+				b"Attr" : chunk_attr,
+				b"CInf" : chunk_cinf,
+				b"Code" : chunk_code,
+				b"ExpT" : chunk_expt,
 #				"FunT" : chunk_funt,
-				"ImpT" : chunk_impt,
+				b"ImpT" : chunk_impt,
 #				"Line" : chink_line,
-				"LitT" : chunk_litt,
-				"LocT" : chunk_loct,
+				b"LitT" : chunk_litt,
+				b"LocT" : chunk_loct,
 #				"StrT" : chunk_strt,
 #				"Trac" : chunk_trac,
 				},
@@ -123,9 +123,9 @@ chunk = Struct("chunk",
 	)
 
 beam = Struct("beam",
-	Const(String('for1',4),'FOR1'),
+	Const(String('for1',4),b'FOR1'),
 	UBInt32("size"),
-	Const(String('beam',4),'BEAM'),
+	Const(String('beam',4),b'BEAM'),
 	OptionalGreedyRange(chunk),
 	Terminator,
 	)
