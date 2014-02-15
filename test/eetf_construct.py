@@ -53,19 +53,19 @@ class EETFConstructTest(unittest.TestCase):
 	def test_atom_utf8(self):
 		c = eetf_construct.atom_utf8
 		self.assertEqual(c.parse('\x00\x06myatom'), 'myatom')
-                self.assertEqual(c.parse(c.build('robots')),'robots')
+		self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_small_atom_utf8(self):
 		c = eetf_construct.small_atom_utf8
 		self.assertEqual(c.parse('\x06myatom'), 'myatom')
-                self.assertEqual(c.parse(c.build('robots')),'robots')
+		self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_atom(self):
 		c = eetf_construct.atom
 		self.assertEqual(c.parse('\x00\x06myatom'), 'myatom')
-                self.assertEqual(c.parse(c.build('robots')),'robots')
+		self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_small_atom(self):
 		c = eetf_construct.small_atom
 		self.assertEqual(c.parse('\x06myatom'), 'myatom')
-                self.assertEqual(c.parse(c.build('robots')),'robots')
+		self.assertEqual(c.parse(c.build('robots')),'robots')
 	def test_reference(self):
 		c = eetf_construct.reference
 		r = erlang_types.Reference("myatom",0x12,0x48)
@@ -97,7 +97,7 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build([1,2,3,'OO'])),[1,2,3,'OO'])
 		self.assertEqual(c.parse(c.build(['Nu','poskoku'])),['Nu','poskoku'])
 		attrs0 = '\x00\x00\x00\x02h\x02d\x00\x03vsnl\x00\x00\x00\x01n\x10\x00\xb3\xf2\xab&|\xd3\xdeHL\xa0\x0fV\xdf\xc1\x05\x96jh\x02d\x00\tbehaviourl\x00\x00\x00\x01d\x00\ngen_serverjj'
-		self.assertEqual(c.parse(attrs0), [('vsn', [199414093051598402244823387542347575987L]), ('behaviour', ['gen_server'])])
+		self.assertEqual(c.parse(attrs0), [('vsn', [199414093051598402244823387542347575987]), ('behaviour', ['gen_server'])])
 
 	def test_nil(self):
 		c = eetf_construct.nil
@@ -107,26 +107,26 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf_construct.bit_binary
 		self.assertEqual(c.parse('\00\00\00\x0a\x03RoBurToVoY'), erlang_types.BitBinary('RoBurToVoY',3))
 		s = erlang_types.BitBinary('RoBurToVoY',1)
-                self.assertEqual(c.parse(c.build(s)),s)
+		self.assertEqual(c.parse(c.build(s)),s)
 	def test_string(self):
 		c = eetf_construct.string
 		self.assertEqual(c.parse('\x00\x0aRoBurToVoY'), erlang_types.String('RoBurToVoY'))
 		s = erlang_types.String('RoBurToVoY')
-                self.assertEqual(c.parse(c.build(s)),s)
+		self.assertEqual(c.parse(c.build(s)),s)
 	def test_binary(self):
 		c = eetf_construct.binary
 		self.assertEqual(c.parse('\x00\x00\x00\x0aRoBurToVoY'), erlang_types.Binary('RoBurToVoY'))
 		s = erlang_types.Binary('RoBurToVoY')
-                self.assertEqual(c.parse(c.build(s)),s)
+		self.assertEqual(c.parse(c.build(s)),s)
 	def test_small_big(self):
 		c = eetf_construct.small_big
 		self.assertEqual(c.parse('\x02\x00\x02\x01'), 258)
 		self.assertEqual(c.parse('\x02\x01\x02\x01'), -258)
-		self.assertEqual(c.parse(c.build(123456789123456789L)),123456789123456789L)
+		self.assertEqual(c.parse(c.build(123456789123456789)),123456789123456789)
 	def test_large_big(self):
 		c = eetf_construct.large_big
 		self.assertEqual(c.parse('\x00\x00\x00\x02\x00\x02\x01'), 258)
-		self.assertEqual(c.parse(c.build(123456789123456789L)),123456789123456789L)
+		self.assertEqual(c.parse(c.build(123456789123456789)),123456789123456789)
 	def test_fun(self):
 		c = eetf_construct.fun
 		self.assertEqual(c.parse('\00\00\00\x02\x64\x00\x06myatom\x64\x00\x06myatom\x61\x13\x64\x00\x06myatom\x64\x00\x06myatom\x64\x00\x06myatom'), erlang_types.Fun(None,None,None,'myatom',0x13,'myatom','myatom',['myatom','myatom']))
