@@ -23,6 +23,7 @@
 
 from construct import *
 from pybeam.eetf_construct import term, external_term
+import codecs
 
 erl_version_magic = Magic(b'\x83')
 
@@ -65,7 +66,10 @@ chunk_impt = Struct("chunk_impt",
 chunk_litt = Struct("chunk_litt",
 	UBInt32("len_uncompressed"),
 	TunnelAdapter(
-		String("data", length = lambda ctx: ctx._.size-4, encoding = "zlib"),
+		ExprAdapter(Bytes("data", length = lambda ctx: ctx._.size-4),
+			encoder = lambda obj,ctx: codecs.encode(obj,"zlib_codec"),
+	                decoder = lambda obj,ctx: codecs.decode(obj,"zlib_codec")
+		),
 		Struct("uncompressed",
 			UBInt32("len"),
 			Array(lambda ctx: ctx.len, Struct("entry",
