@@ -34,37 +34,37 @@ class BeamFile(object):
 
 	@property
 	def atoms(self):
-		return self.selectChunkByName("Atom").payload
+		return self.selectChunkByName(b"Atom").payload
 
 	@property
 	def attributes(self):
-		attr = self.selectChunkByName("Attr")
+		attr = self.selectChunkByName(b"Attr")
 		# convert from proplist to dict
 		return dict(attr.payload)
 
 	@property
 	def code(self):
-		code = self.selectChunkByName("Code").payload
+		code = self.selectChunkByName(b"Code").payload
 		return (code.set, code.opcode_max, code.labels, code.functions, code.code)
 
 	@property
 	def compileinfo(self):
-		cinf = self.selectChunkByName("CInf")
+		cinf = self.selectChunkByName(b"CInf")
 		return dict(cinf.payload)
 
 	@property
 	def exports(self):
-		expt = self.selectChunkByName("ExpT")
+		expt = self.selectChunkByName(b"ExpT")
 		atoms = self.atoms
 		return [(atoms[e.function-1], e.arity, e.label) for e in expt.payload.entry]
 
 	@property
 	def literals(self):
-		return [e.term for e in self.selectChunkByName("LitT").payload.data.entry]
+		return [e.term for e in self.selectChunkByName(b"LitT").payload.data.entry]
 
 	@property
 	def imports(self):
-		impt = self.selectChunkByName("ImpT")
+		impt = self.selectChunkByName(b"ImpT")
 		atoms = self.atoms
 		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.payload.entry]
 
@@ -74,5 +74,5 @@ class BeamFile(object):
 
 	@property
 	def strings(self):
-		strt = self.selectChunkByName("StrT")
+		strt = self.selectChunkByName(b"StrT")
 		return strt.payload
