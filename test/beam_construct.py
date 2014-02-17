@@ -59,3 +59,9 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), "burtovoy")
 		self.assertEqual(c.parse(c.build("burtovoy")), "burtovoy")
 		self.assertEqual(c.parse(b'\x83\x6a'), [])
+	def test_chunk_litt(self):
+		c = beam_construct.chunk
+		littc = b'x\x9cc```d```j\xce\x02\x00\x01\x87\x00\xf1'
+		litt = b'LitT\x00\x00\x00\x16\x00\x00\x00\x0a' + littc + b'\x00\x00'
+		self.assertEqual(c.parse(litt).payload.data.entry[0].term, [])
+
