@@ -14,6 +14,8 @@ print p.exports
 print p.atoms
 ```
 
+Both python 2.7 and python 3.3 are supported. Python 3.2 are known not to work.
+
 ## References
 * [Erlang BEAM file format](http://www.erlang.se/~bjorn/beam_file_format.html)
 * [Erlang external term format](http://erlang.org/doc/apps/erts/erl_ext_dist.html)
