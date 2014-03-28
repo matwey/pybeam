@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 #
 
+from six import iterbytes
+
 class AtomCacheReference:
 	def __init__(self, index):
 		self.index = index
@@ -56,6 +58,10 @@ class String:
 		self.value = value
 	def __eq__(self, other):
 		return self.value == other.value
+	def __iter__(self):
+		return iterbytes(self.value)
+	def __len__(self):
+		return len(self.value)
 
 class Binary:
 	def __init__(self, value):

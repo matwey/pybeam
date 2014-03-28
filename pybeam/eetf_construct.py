@@ -122,7 +122,7 @@ large_tuple = TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term),
 nil = ExprAdapter(Sequence("nil"),
 		encoder = lambda obj,ctx: (),
 		decoder = lambda obj,ctx: [])
-string = ExprAdapter(PascalString("string", length_field = UBInt16("length"), encoding="utf8"),
+string = ExprAdapter(PascalString("string", length_field = UBInt16("length"), encoding=None),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: etString(obj))
 list_ = ExprAdapter(Sequence("list",
