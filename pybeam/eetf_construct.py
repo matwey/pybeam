@@ -36,6 +36,15 @@ class TupleAdapter(Adapter):
 	def _encode(self, obj, ctv):
 		return list(obj)
 
+class ListAdapter(Adapter):
+	def _decode(self, obj, ctx):
+		if type(obj[2]) == type(list()) and obj[2] == []:
+			return obj[1]
+		obj[1].append(obj[2])
+		return obj[1]
+	def _encode(self, obj, ctx):
+		return (len(obj), obj, [])
+
 def BigInteger(subconname, length_field = UBInt8("length")):
 	def decode_big(obj,ctx):
 		(length, isNegative, value) = obj
@@ -125,14 +134,12 @@ nil = ExprAdapter(Sequence("nil"),
 string = ExprAdapter(PascalString("string", length_field = UBInt16("length"), encoding=None),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: etString(obj))
-list_ = ExprAdapter(Sequence("list",
+list_ = ListAdapter(Sequence("list",
 		UBInt32("length"),
 		Array(lambda ctx: ctx.length, LazyBound("elements", lambda : term)),
 		LazyBound("tail", lambda : term),
-		nested = False
-		),
-		encoder = lambda obj,ctx: (len(obj), obj, []),
-		decoder = lambda obj,ctx: obj[1] + obj[2])
+		nested = False,
+		))
 binary = ExprAdapter(PascalString("binary", length_field = UBInt32("length")),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: Binary(obj))

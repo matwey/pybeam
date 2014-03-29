@@ -99,7 +99,8 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build(['Nu','poskoku'])),['Nu','poskoku'])
 		attrs0 = b'\x00\x00\x00\x02h\x02d\x00\x03vsnl\x00\x00\x00\x01n\x10\x00\xb3\xf2\xab&|\xd3\xdeHL\xa0\x0fV\xdf\xc1\x05\x96jh\x02d\x00\tbehaviourl\x00\x00\x00\x01d\x00\ngen_serverjj'
 		self.assertEqual(c.parse(attrs0), [('vsn', [199414093051598402244823387542347575987]), ('behaviour', ['gen_server'])])
-
+		t1 = b'\x00\x00\x00\x01d\x00\x05alignm\x00\x00\x00\x02\x01\x00'
+		self.assertEqual(c.parse(t1), ['align', erlang_types.Binary(b'\x01\x00')])
 	def test_nil(self):
 		c = eetf_construct.nil
 		self.assertEqual(c.parse(b'\x6a'), [])
