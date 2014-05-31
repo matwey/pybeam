@@ -45,6 +45,12 @@ class ListAdapter(Adapter):
 	def _encode(self, obj, ctx):
 		return (len(obj), obj, [])
 
+class MapAdapter(Adapter):
+	def _decode(self, obj, ctx):
+		return dict(obj)
+	def _encode(self, obj, ctx):
+		return list(obj.items())
+
 def BigInteger(subconname, length_field = UBInt8("length")):
 	def decode_big(obj,ctx):
 		(length, isNegative, value) = obj
@@ -88,6 +94,7 @@ def tag(obj,ctx):
 		long : 111,
 		Fun : 112,
 		MFA : 113,
+		map : 116,
 		BitBinary : 77,	
 	}
 	if obj == []:
@@ -183,6 +190,13 @@ bit_binary = ExprAdapter(Sequence("bit_binary",
 new_float = BFloat64("new_float")
 atom_utf8 = PascalString("atom_utf8", length_field = UBInt16("length"), encoding="utf8")
 small_atom_utf8 = PascalString("small_atom_utf8", encoding="utf8")
+key_value = ExprAdapter(Sequence("key_value",
+	LazyBound("key", lambda : term),
+	LazyBound("value", lambda : term)),
+		encoder = lambda obj,ctx: obj,
+		decoder = lambda obj,ctx: tuple(obj)
+	)
+map = MapAdapter(PrefixedArray(key_value, length_field = UBInt32("arity")))
 
 term = ExprAdapter(Sequence("term",
 	UBInt8("tag"),
@@ -206,6 +220,7 @@ term = ExprAdapter(Sequence("term",
 			111: large_big,
 			114: new_reference,
 			115: small_atom,
+			116: map,
 			117: fun,
 			112: new_fun,
 			113: export,

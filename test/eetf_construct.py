@@ -146,3 +146,11 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build(258)), 258)
 		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
 		self.assertEqual(c.build('BurToVoY'), b'\x83\x64\x00\x08BurToVoY')
+	def test_key_value(self):
+		c = eetf_construct.key_value
+		self.assertEqual(c.parse(b'a\x01a\x02'), (1,2))
+		self.assertEqual(c.parse(c.build((1,2))), (1,2))
+	def test_map(self):
+		c = eetf_construct.map
+		self.assertEqual(c.parse(b'\x00\x00\x00\x02a\x01a\x02a\x03a\x04'), {1:2,3:4})
+		self.assertEqual(c.parse(c.build({1:2,3:4})), {1:2,3:4})
