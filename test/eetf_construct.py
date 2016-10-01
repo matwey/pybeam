@@ -84,11 +84,11 @@ class EETFConstructTest(unittest.TestCase):
 	def test_pid(self):
 		c = eetf_construct.pid
 		self.assertEqual(c.parse(b'\x64\x00\x06myatom\x00\x00\x00\x12\x00\x00\x00\x32\x48'), erlang_types.Pid("myatom",0x12,0x32,0x48))
-	def test_small_typle(self):
+	def test_small_tuple(self):
 		c = eetf_construct.small_tuple
 		self.assertEqual(c.parse(b"\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
 		self.assertEqual(c.parse(c.build((1,2,'myatom'))),(1,2,'myatom'))
-	def test_large_typle(self):
+	def test_large_tuple(self):
 		c = eetf_construct.large_tuple
 		self.assertEqual(c.parse(b"\x00\x00\x00\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
 		self.assertEqual(c.parse(c.build((1,2,'myatom'))),(1,2,'myatom'))
@@ -140,6 +140,12 @@ class EETFConstructTest(unittest.TestCase):
 		mfa = erlang_types.MFA('myatom','myat0m',0x13)
 		self.assertEqual(c.parse(b'\x64\x00\x06myatom\x64\x00\x06myat0m\x61\x13'),mfa)
 		self.assertEqual(c.parse(c.build(mfa)),mfa)
+	def test_term(self):
+		c = eetf_construct.term
+		self.assertEqual(c.parse(b'\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
+		self.assertEqual(c.parse(c.build(258)), 258)
+		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
+		self.assertEqual(c.build('BurToVoY'), b'\x64\x00\x08BurToVoY')
 	def test_external(self):
 		c = eetf_construct.external_term
 		self.assertEqual(c.parse(b'\x83\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
