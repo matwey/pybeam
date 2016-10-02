@@ -40,13 +40,13 @@ chunk_code = Struct("headerlen" / Int32ub,
 	Bytes(lambda ctx: ctx._.size-ctx.headerlen-4),
 	)
 
-chunk_expt = PrefixedArray(Int32ub, Struct("function" / Int32ub,
+chunk_expt = Struct("entry" / PrefixedArray(Int32ub, Struct("function" / Int32ub,
 	"arity" / Int32ub,
-	"label" / Int32ub))
+	"label" / Int32ub)))
 
-chunk_impt = PrefixedArray(Int32ub, Struct("module" / Int32ub,
+chunk_impt = Struct("entry" / PrefixedArray(Int32ub, Struct("module" / Int32ub,
 	"function" / Int32ub,
-	"arity" / Int32ub))
+	"arity" / Int32ub)))
 
 uncomp_chunk_litt = Struct("entry" / PrefixedArray(Int32ub, Prefixed(Int32ub, Struct("term" / external_term))))
 chunk_litt = Struct(Int32ub,
