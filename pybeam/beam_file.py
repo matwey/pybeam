@@ -73,8 +73,3 @@ class BeamFile(object):
 	@property
 	def modulename(self):
 		return self.atoms[0]
-
-	@property
-	def strings(self):
-		strt = self.selectChunkByName(b"StrT")
-		return strt.payload

@@ -51,5 +51,3 @@ class BEAMFileTest(unittest.TestCase):
 		self.assertListEqual([('crypto', 'mod_pow', 3), ('crypto', 'bytes_to_integer', 1), ('erlang', 'get_module_info', 1), ('erlang', 'get_module_info', 2)], self.beam.imports)
 	def test_modulename(self):
 		self.assertEqual('ssh_math', self.beam.modulename)
-	def test_strings(self):
-		self.assertListEqual([], self.beam.strings)

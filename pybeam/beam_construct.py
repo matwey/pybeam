@@ -59,8 +59,6 @@ chunk_loct = PrefixedArray(Int32ub, Struct("function" / Int32ub,
 	"arity" / Int32ub,
 	"label" / Int32ub))
 
-chunk_strt = Struct("string" / PascalString(lengthfield = Int32ub, encoding="latin1"))
-
 chunk = Struct(
 	"chunk_name" / String(4),
 	"size" / Int32ub,
