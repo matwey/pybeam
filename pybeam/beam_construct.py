@@ -89,7 +89,7 @@ beam = Struct(
 	"size" / Int32ub,
 	"beam" / Const(b'BEAM'),
 	"chunk" / GreedyRange(chunk),
-	Terminator,
+	Terminated,
 	)
 
 __all__ = ["beam"]
