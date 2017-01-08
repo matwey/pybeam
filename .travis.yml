@@ -8,7 +8,7 @@ python:
   - "3.6"
 # command to install dependencies
 install:
-  - "pip install construct"
+  - "pip install 'construct>=2.5,<2.8'"
 # command to run tests
 script:
   - "python -m unittest test"
