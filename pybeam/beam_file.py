@@ -23,8 +23,10 @@
 from pybeam.beam_construct import beam
 
 class BeamFile(object):
-	def __init__(self, filename):
-		self._tree = beam.parse(open(filename,"rb").read())
+	def __init__(self, f):
+		if not hasattr(f, 'read'):
+			f = open(filename,"rb")
+		self._tree = beam.parse(f.read())
 
 	def selectChunkByName(self, name):
 		for c in self._tree.chunk:
@@ -71,8 +73,3 @@ class BeamFile(object):
 	@property
 	def modulename(self):
 		return self.atoms[0]
-
-	@property
-	def strings(self):
-		strt = self.selectChunkByName(b"StrT")
-		return strt.payload

@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
   - "3.4"
@@ -8,7 +7,7 @@ python:
   - "3.6"
 # command to install dependencies
 install:
-  - "pip install 'construct>=2.5,<2.8'"
+  - "pip install 'construct>=2.8'"
 # command to run tests
 script:
   - "python -m unittest test"

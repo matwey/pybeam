@@ -25,83 +25,44 @@ from construct import *
 from pybeam.eetf_construct import term, external_term
 import codecs
 
-erl_version_magic = Magic(b'\x83')
+chunk_atom = PrefixedArray(Int32ub, PascalString(lengthfield = Int8ub, encoding="latin1"))
 
-chunk_atom = Rename("chunk_atom", PrefixedArray(PascalString("atom", encoding="latin1"), length_field = UBInt32("len")))
+chunk_attr = external_term
 
-chunk_attr = Rename("chunk_attr", external_term)
+chunk_cinf = external_term
 
-chunk_cinf = Rename("chunk_cinf", external_term)
-
-chunk_code = Struct("chunk_code",
-	UBInt32("headerlen"),
-	UBInt32("set"),
-	UBInt32("opcode_max"),
-	UBInt32("labels"),
-	UBInt32("functions"),
-	Bytes("skip", lambda ctx: ctx.headerlen-16),
-	Bytes("code", lambda ctx: ctx._.size-ctx.headerlen-4),
+chunk_code = Struct("headerlen" / Int32ub,
+	"set" / Int32ub,
+	"opcode_max" / Int32ub,
+	"labels" / Int32ub,
+	"functions" / Int32ub,
+	Bytes(lambda ctx: ctx.headerlen-16),
+	Bytes(lambda ctx: ctx._.size-ctx.headerlen-4),
 	)
 
-chunk_expt = Struct("chunk_expt",
-	UBInt32("len"),
-	Array(lambda ctx: ctx.len, Struct("entry",
-			UBInt32("function"),
-			UBInt32("arity"),
-			UBInt32("label"),
-		)
-	)
-	)
+chunk_expt = Struct("entry" / PrefixedArray(Int32ub, Struct("function" / Int32ub,
+	"arity" / Int32ub,
+	"label" / Int32ub)))
 
-chunk_impt = Struct("chunk_impt",
-	UBInt32("len"),
-	Array(lambda ctx: ctx.len, Struct("entry",
-			UBInt32("module"),
-			UBInt32("function"),
-			UBInt32("arity"),
-		)
-	)
-	)
+chunk_impt = Struct("entry" / PrefixedArray(Int32ub, Struct("module" / Int32ub,
+	"function" / Int32ub,
+	"arity" / Int32ub)))
 
-chunk_litt = Struct("chunk_litt",
-	UBInt32("len_uncompressed"),
-	TunnelAdapter(
-		ExprAdapter(Bytes("data", length = lambda ctx: ctx._.size-4),
-			encoder = lambda obj,ctx: codecs.encode(obj,"zlib_codec"),
-	                decoder = lambda obj,ctx: codecs.decode(obj,"zlib_codec")
-		),
-		Struct("uncompressed",
-			UBInt32("len"),
-			Array(lambda ctx: ctx.len, Struct("entry",
-					UBInt32("len"),
-					erl_version_magic,
-					term
-				)
-			)
-		)
+uncomp_chunk_litt = Struct("entry" / PrefixedArray(Int32ub, Prefixed(Int32ub, Struct("term" / external_term))))
+chunk_litt = Struct(Int32ub,
+	"data" / Prefixed(Computed(lambda ctx: ctx._.size-4),
+		Compressed(uncomp_chunk_litt, "zlib")
 	)
-	)
+)
 
-chunk_loct = Struct("chunk_loct",
-	UBInt32("len"),
-	Array(lambda ctx: ctx.len, Struct("entry",
-			UBInt32("function"),
-			UBInt32("arity"),
-			UBInt32("label"),
-		)
-	)
-	)
+chunk_loct = PrefixedArray(Int32ub, Struct("function" / Int32ub,
+	"arity" / Int32ub,
+	"label" / Int32ub))
 
-chunk_strt = Struct("chunk_strt",
-	PascalString("string", length_field = UBInt32("len"), encoding="latin1")
-	)
-
-chunk = Struct("chunk",
-	String("chunk_name",4),
-	UBInt32("size"),
-	If(lambda ctx: ctx.size > 0,
-		SeqOfOne("payload",
-			Switch("payload", lambda ctx: ctx.chunk_name,
+chunk = Struct(
+	"chunk_name" / String(4),
+	"size" / Int32ub,
+	"payload" / Switch(this.chunk_name,
 				{
 #				"Abst" : chunk_abst,
 				b"Atom" : chunk_atom,
@@ -117,21 +78,18 @@ chunk = Struct("chunk",
 #				"StrT" : chunk_strt,
 #				"Trac" : chunk_trac,
 				},
-				default = Bytes("skip", lambda ctx: ctx.size)
+				default = Bytes(lambda ctx: ctx.size)
 			),
-			Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = "\00"),
-			nested = False,
-		),
-		[]
+# Aligned(4, ..)
+			Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = b'\00'),
 		)
-	)
 
-beam = Struct("beam",
-	Const(String('for1',4),b'FOR1'),
-	UBInt32("size"),
-	Const(String('beam',4),b'BEAM'),
-	OptionalGreedyRange(chunk),
-	Terminator,
+beam = Struct(
+	"for1" / Const(b'FOR1'),
+	"size" / Int32ub,
+	"beam" / Const(b'BEAM'),
+	"chunk" / GreedyRange(chunk),
+	Terminated,
 	)
 
 __all__ = ["beam"]

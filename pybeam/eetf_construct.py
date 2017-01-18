@@ -51,7 +51,7 @@ class MapAdapter(Adapter):
 	def _encode(self, obj, ctx):
 		return list(obj.items())
 
-def BigInteger(subconname, length_field = UBInt8("length")):
+def BigInteger(length_field):
 	def decode_big(obj,ctx):
 		(length, isNegative, value) = obj
 		ret = sum([d << i*8 for (d,i) in zip(value,range(0,len(value)))])
@@ -70,11 +70,9 @@ def BigInteger(subconname, length_field = UBInt8("length")):
 			obj = obj >> 8
 		return (len(value), isNegative, value)
 
-	return ExprAdapter(Sequence(subconname,
-		length_field,
-		UBInt8("isNegative"),
-		Array(lambda ctx: ctx.length, UBInt8("value")),
-		nested = False),
+	return ExprAdapter(Sequence("len" / length_field,
+		"isNegative" / Int8ub,
+		"value" / Array(lambda ctx: ctx.len, Int8ub)),
 		encoder = encode_big,
 		decoder = decode_big)
 
@@ -102,142 +100,122 @@ def tag(obj,ctx):
 	else: 
 		return mapping[obj.__class__]
 
-atom_cache_ref = ExprAdapter(UBInt8("atom_cache_ref"),
+# Recurrent term
+term_ = LazyBound(lambda ctx: term)
+
+atom_cache_ref = ExprAdapter(Int8ub,
 		encoder = lambda obj,ctx: obj.index,
 		decoder = lambda obj,ctx: AtomCacheReference(obj))
-small_integer = UBInt8("small_integer")
-integer = SBInt32("integer")
-float_ = ExprAdapter(String("float",31,padchar='\00',encoding="latin1"),
+small_integer = Int8ub
+integer = Int32sb
+float_ = ExprAdapter(String(31,padchar=b'\00',encoding="latin1"),
 		encoder = lambda obj,ctx: "%.20e    " % obj,
 		decoder = lambda obj,ctx: float(obj.strip()))
-atom = PascalString("atom", length_field = UBInt16("length"), encoding="latin1")
-reference = ExprAdapter(Sequence("reference",
-		LazyBound("Node", lambda : term),
-		UBInt32("ID"),
-		UBInt8("Creation"),
-		nested = False),
+atom = PascalString(lengthfield = Int16ub, encoding="latin1")
+reference = ExprAdapter(Sequence("node" / term_,
+		"id" / Int32ub,
+		"creation" / Int8ub),
 		encoder = lambda obj,ctx: (obj.node, obj.id, obj.creation),
 		decoder = lambda obj,ctx: Reference(*obj))
-port = ExprAdapter(Sequence("port",
-		LazyBound("Node", lambda : term),
-		UBInt32("ID"),
-		UBInt8("Creation"),
-		nested = False),
+port = ExprAdapter(Sequence("node" / term_,
+		"id" / Int32ub,
+		"creation" / Int8ub),
 		encoder = lambda obj,ctx: (obj.node, obj.id, obj.creation),
 		decoder = lambda obj,ctx: Port(*obj))
-pid = ExprAdapter(Sequence("pid",
-		LazyBound("Node", lambda : term),
-		UBInt32("ID"),
-		UBInt32("Serial"),
-		UBInt8("Creation"),
-		nested = False),
+pid = ExprAdapter(Sequence("node" / term_,
+		"id" / Int32ub,
+		"serial" / Int32ub,
+		"creation" / Int8ub),
 		encoder = lambda obj,ctx: (obj.node, obj.id, obj.serial, obj.creation),
 		decoder = lambda obj,ctx: Pid(*obj))
-small_tuple = TupleAdapter(PrefixedArray(LazyBound("small_tuple",lambda : term), length_field = UBInt8("arity")))
-large_tuple = TupleAdapter(PrefixedArray(LazyBound("large_tuple",lambda : term), length_field = UBInt32("arity")))
-nil = ExprAdapter(Sequence("nil"),
+small_tuple = TupleAdapter(PrefixedArray(Int8ub,  term_))
+large_tuple = TupleAdapter(PrefixedArray(Int32ub, term_))
+nil = ExprAdapter(Sequence(),
 		encoder = lambda obj,ctx: (),
 		decoder = lambda obj,ctx: [])
-string = ExprAdapter(PascalString("string", length_field = UBInt16("length"), encoding=None),
+string = ExprAdapter(PascalString(lengthfield = Int16ub, encoding=None),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: etString(obj))
-list_ = ListAdapter(Sequence("list",
-		UBInt32("length"),
-		Array(lambda ctx: ctx.length, LazyBound("elements", lambda : term)),
-		LazyBound("tail", lambda : term),
-		nested = False,
-		))
-binary = ExprAdapter(PascalString("binary", length_field = UBInt32("length")),
+list_ = ListAdapter(Sequence("len" / Int32ub,
+		Array(this.len, term_),
+		term_))
+binary = ExprAdapter(PascalString(lengthfield = Int32ub),
 		encoder = lambda obj,ctx: obj.value,
 		decoder = lambda obj,ctx: Binary(obj))
-small_big = BigInteger("small_big", length_field = UBInt8("length"))
-large_big = BigInteger("large_big", length_field = UBInt32("length"))
-new_reference = ExprAdapter(Sequence("new_reference",
-		UBInt16("Len"),
-		LazyBound("Node", lambda : term),
-		UBInt8("Creation"),
-		Array(lambda ctx: ctx.Len, UBInt32("ID")),
-		nested = False),
+small_big = BigInteger(Int8ub)
+large_big = BigInteger(Int32ub)
+new_reference = ExprAdapter(Sequence("len" / Int16ub,
+		"node" / term_,
+		"creation" / Int8ub,
+		"id" / Array(this.len, Int32ub)),
 		encoder = lambda obj,ctx: (len(obj.id), obj.node, obj.creation, obj.id),
 		decoder = lambda obj,ctx: Reference(obj[1], obj[3], obj[2]))
-small_atom = PascalString("small_atom", encoding="latin1")
-fun = ExprAdapter(Sequence("fun",
-		UBInt32("NumFree"),
-		LazyBound("Pid", lambda : term),
-		LazyBound("Module", lambda : term),
-		LazyBound("Index", lambda : term),
-		LazyBound("Uniq", lambda : term),
-		Array(lambda ctx: ctx.NumFree, LazyBound("FreeVars", lambda : term)),
-		nested = False),
+small_atom = PascalString(lengthfield = Int8ub, encoding="latin1")
+fun = ExprAdapter(Sequence("num_free" / Int32ub,
+		"pid" / term_,
+		"module" / term_,
+		"oldindex" / term_,
+		"olduniq" / term_,
+		"free" / Array(this.num_free, term_)),
                 encoder = lambda obj,ctx: (len(obj.free), obj.pid, obj.module, obj.oldindex, olj.olduniq, obj.free) ,
                 decoder = lambda obj,ctx: Fun(None, None, None, obj[2], obj[3], obj[4], obj[1], obj[5]))
 # new fun to be implemented later
 new_fun = fun
-export = ExprAdapter(Sequence("export",
-		LazyBound("Module", lambda : term),
-		LazyBound("Function", lambda : term),
-		LazyBound("Arity", lambda : term),
-		nested = False),
+export = ExprAdapter(Sequence("module" / LazyBound(lambda ctx: term),
+		"function" / LazyBound(lambda ctx: term),
+		"arity" / LazyBound(lambda ctx: term)),
 		encoder = lambda obj,ctx: (obj.module, obj.function, obj.arity),
 		decoder = lambda obj,ctx: MFA(*obj))
-bit_binary = ExprAdapter(Sequence("bit_binary",
-		UBInt32("Len"),
-		UBInt8("Bits"),
-		String("Data", lambda ctx: ctx.Len),
-		nested = False),
+bit_binary = ExprAdapter(Sequence("len" / Int32ub,
+		"bits" / Int8ub,
+		"data" / String(this.len)),
 		encoder = lambda obj,ctx: (len(obj.value), obj.bits, obj.value),
 		decoder = lambda obj,ctx: BitBinary(obj[2],obj[1]))
-new_float = BFloat64("new_float")
-atom_utf8 = PascalString("atom_utf8", length_field = UBInt16("length"), encoding="utf8")
-small_atom_utf8 = PascalString("small_atom_utf8", encoding="utf8")
-key_value = ExprAdapter(Sequence("key_value",
-	LazyBound("key", lambda : term),
-	LazyBound("value", lambda : term)),
+new_float = Float64b
+atom_utf8 = PascalString(lengthfield = Int16ub, encoding="utf8")
+small_atom_utf8 = PascalString(lengthfield = Int8ub, encoding="utf8")
+key_value = ExprAdapter(Sequence(term_,term_),
 		encoder = lambda obj,ctx: obj,
-		decoder = lambda obj,ctx: tuple(obj)
-	)
-map = MapAdapter(PrefixedArray(key_value, length_field = UBInt32("arity")))
+		decoder = lambda obj,ctx: tuple(obj))
+map = MapAdapter(PrefixedArray(Int32ub, key_value))
 
-term = ExprAdapter(Sequence("term",
-	UBInt8("tag"),
-	Switch("payload", lambda ctx: ctx.tag,
-                {
-			82: atom_cache_ref,
-			97: small_integer,
-			98: integer,
-			99: float_,
-			100: atom,
-			101: reference,
-			102: port,
-			103: pid,
-			104: small_tuple,
-			105: large_tuple,
-			106: nil,
-			107: string,
-			108: list_,
-			109: binary,
-			110: small_big,
-			111: large_big,
-			114: new_reference,
-			115: small_atom,
-			116: map,
-			117: fun,
-			112: new_fun,
-			113: export,
-			77: bit_binary,
-			70: new_float,
-			118: atom_utf8,
-			119: small_atom_utf8,
-                },),
-	nested = False),
-		lambda obj, ctx: (tag(obj, ctx), obj),
-		lambda obj, ctx: obj[1]
+term = ExprAdapter(Sequence("tag" / Int8ub,
+	Switch(this.tag, {
+		82: atom_cache_ref,
+		97: small_integer,
+		98: integer,
+		99: float_,
+		100: atom,
+		101: reference,
+		102: port,
+		103: pid,
+		104: small_tuple,
+		105: large_tuple,
+		106: nil,
+		107: string,
+		108: list_,
+		109: binary,
+		110: small_big,
+		111: large_big,
+		114: new_reference,
+		115: small_atom,
+		116: map,
+		117: fun,
+		112: new_fun,
+		113: export,
+		77: bit_binary,
+		70: new_float,
+		118: atom_utf8,
+		119: small_atom_utf8,
+	})),
+	lambda obj,ctx: (tag(obj, ctx), obj),
+	lambda obj,ctx: obj[1]
 	)
 
-erl_version_magic = Magic(b'\x83')
+erl_version_magic = Const(b'\x83')
 
-external_term = SeqOfOne("external_term",erl_version_magic,term)
+external_term = ExprAdapter(Sequence(erl_version_magic, term),
+	encoder = lambda obj,ctx: (None, obj),
+	decoder = lambda obj,ctx: obj[1])
 
 __all__ = ["term", "external_term"]
-
-
