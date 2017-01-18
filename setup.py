@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pybeam',
-      version='0.3.3',
+      version='0.4-rc1',
       description='Python module to parse Erlang BEAM files',
       url='http://github.com/matwey/pybeam',
       author='Matwey V. Kornilov',
