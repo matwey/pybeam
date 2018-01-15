@@ -22,8 +22,7 @@
 #
 
 from construct import *
-from pybeam.eetf_construct import term, external_term
-import codecs
+from pybeam.eetf_construct import external_term
 
 chunk_atom = PrefixedArray(Int32ub, PascalString(lengthfield = Int8ub, encoding="latin1"))
 
