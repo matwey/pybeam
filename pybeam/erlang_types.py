@@ -22,13 +22,13 @@
 
 from six import iterbytes
 
-class AtomCacheReference:
+class AtomCacheReference(object):
 	def __init__(self, index):
 		self.index = index
 	def __eq__(self,other):
 		return self.index == other.index
 
-class Reference:
+class Reference(object):
 	def __init__(self, node, id, creation):
 		self.node = node
 		self.id = id
@@ -36,7 +36,7 @@ class Reference:
 	def __eq__(self,other):
 		return self.node == other.node and self.id == other.id and self.creation == other.creation
 
-class Port:
+class Port(object):
 	def __init__(self, node, id, creation):
 		self.node = node
 		self.id = id
@@ -44,7 +44,7 @@ class Port:
 	def __eq__(self,other):
 		return self.node == other.node and self.id == other.id and self.creation == other.creation
 
-class Pid:
+class Pid(object):
 	def __init__(self, node, id, serial, creation):
 		self.node = node
 		self.id = id
@@ -53,7 +53,7 @@ class Pid:
 	def __eq__(self,other):
 		return self.node == other.node and self.id == other.id and self.creation == other.creation and self.serial == other.serial
 
-class String:
+class String(object):
 	def __init__(self, value):
 		self.value = value
 	def __eq__(self, other):
@@ -63,13 +63,13 @@ class String:
 	def __len__(self):
 		return len(self.value)
 
-class Binary:
+class Binary(object):
 	def __init__(self, value):
 		self.value = value
 	def __eq__(self, other):
 		return self.value == other.value
 
-class Fun:
+class Fun(object):
 	def __init__(self, arity, uniq, index, module, oldindex, olduniq, pid, free):
 		self.arity = arity
 		self.uniq = uniq
@@ -82,7 +82,7 @@ class Fun:
 	def __eq__(self, other):
 		return self.arity == other.arity and self.uniq == other.uniq and self.index == other.index and self.module == other.module and self.oldindex == other.oldindex and self.olduniq == other.uniq and self.pid == other.pid and self.free == other.free
 
-class MFA:
+class MFA(object):
 	def __init__(self, module, function, arity):
 		self.module = module
 		self.function = function
@@ -90,7 +90,7 @@ class MFA:
 	def __eq__(self, other):
 		return self.module == other.module and self.function == other.function and self.arity == other.arity
 
-class BitBinary:
+class BitBinary(object):
 	def __init__(self, value, bits):
 		self.value = value
 		self.bits = bits
