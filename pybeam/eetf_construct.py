@@ -157,7 +157,7 @@ fun = ExprAdapter(Sequence("num_free" / Int32ub,
 		"oldindex" / term_,
 		"olduniq" / term_,
 		"free" / Array(this.num_free, term_)),
-                encoder = lambda obj,ctx: (len(obj.free), obj.pid, obj.module, obj.oldindex, olj.olduniq, obj.free) ,
+                encoder = lambda obj,ctx: (len(obj.free), obj.pid, obj.module, obj.oldindex, obj.olduniq, obj.free) ,
                 decoder = lambda obj,ctx: Fun(None, None, None, obj[2], obj[3], obj[4], obj[1], obj[5]))
 # new fun to be implemented later
 new_fun = fun
