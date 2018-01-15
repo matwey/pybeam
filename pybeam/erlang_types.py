@@ -85,7 +85,7 @@ class Fun(object):
 			and self.index == other.index
 			and self.module == other.module
 			and self.oldindex == other.oldindex
-			and self.olduniq == other.uniq
+			and self.olduniq == other.olduniq
 			and self.pid == other.pid
 			and self.free == other.free)
 
