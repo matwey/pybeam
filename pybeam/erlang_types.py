@@ -29,25 +29,25 @@ class AtomCacheReference(object):
 		return self.index == other.index
 
 class Reference(object):
-	def __init__(self, node, id, creation):
+	def __init__(self, node, id_, creation):
 		self.node = node
-		self.id = id
+		self.id = id_
 		self.creation = creation
 	def __eq__(self,other):
 		return self.node == other.node and self.id == other.id and self.creation == other.creation
 
 class Port(object):
-	def __init__(self, node, id, creation):
+	def __init__(self, node, id_, creation):
 		self.node = node
-		self.id = id
+		self.id = id_
 		self.creation = creation
 	def __eq__(self,other):
 		return self.node == other.node and self.id == other.id and self.creation == other.creation
 
 class Pid(object):
-	def __init__(self, node, id, serial, creation):
+	def __init__(self, node, id_, serial, creation):
 		self.node = node
-		self.id = id
+		self.id = id_
 		self.serial = serial
 		self.creation = creation
 	def __eq__(self,other):
