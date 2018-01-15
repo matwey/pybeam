@@ -80,8 +80,8 @@ chunk = Struct(
 				default = Bytes(lambda ctx: ctx.size)
 			),
 # Aligned(4, ..)
-			Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = b'\00'),
-		)
+	Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = b'\00'),
+	)
 
 beam = Struct(
 	"for1" / Const(b'FOR1'),
