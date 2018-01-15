@@ -76,7 +76,7 @@ class Fun(object):
 		self.index = index
 		self.module = module
 		self.oldindex = oldindex
-		self.olduniq = uniq
+		self.olduniq = olduniq
 		self.pid = pid
 		self.free = free
 	def __eq__(self, other):
