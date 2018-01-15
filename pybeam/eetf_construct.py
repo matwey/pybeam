@@ -38,7 +38,7 @@ class TupleAdapter(Adapter):
 
 class ListAdapter(Adapter):
 	def _decode(self, obj, ctx):
-		if obj[2] == []:
+		if isinstance(obj[2], list) and obj[2] == []:
 			return obj[1]
 		obj[1].append(obj[2])
 		return obj[1]
