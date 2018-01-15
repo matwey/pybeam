@@ -80,7 +80,14 @@ class Fun(object):
 		self.pid = pid
 		self.free = free
 	def __eq__(self, other):
-		return self.arity == other.arity and self.uniq == other.uniq and self.index == other.index and self.module == other.module and self.oldindex == other.oldindex and self.olduniq == other.uniq and self.pid == other.pid and self.free == other.free
+		return (self.arity == other.arity
+			and self.uniq == other.uniq
+			and self.index == other.index
+			and self.module == other.module
+			and self.oldindex == other.oldindex
+			and self.olduniq == other.uniq
+			and self.pid == other.pid
+			and self.free == other.free)
 
 class MFA(object):
 	def __init__(self, module, function, arity):
