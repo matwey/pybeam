@@ -31,7 +31,7 @@ if sys.version > '3':
 
 class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
-# we got a list from construct and want to see a tuple
+		# we got a list from construct and want to see a tuple
 		return tuple(obj)
 	def _encode(self, obj, ctv):
 		return list(obj)
