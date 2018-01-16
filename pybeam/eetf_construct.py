@@ -33,7 +33,7 @@ class TupleAdapter(Adapter):
 	def _decode(self, obj, ctx):
 		# we got a list from construct and want to see a tuple
 		return tuple(obj)
-	def _encode(self, obj, ctv):
+	def _encode(self, obj, ctx):
 		return list(obj)
 
 class ListAdapter(Adapter):
