@@ -177,7 +177,7 @@ small_atom_utf8 = PascalString(lengthfield = Int8ub, encoding="utf8")
 key_value = ExprAdapter(Sequence(term_,term_),
 		encoder = lambda obj,ctx: obj,
 		decoder = lambda obj,ctx: tuple(obj))
-map = MapAdapter(PrefixedArray(Int32ub, key_value))
+map_ = MapAdapter(PrefixedArray(Int32ub, key_value))
 
 term = ExprAdapter(Sequence("tag" / Int8ub,
 	Switch(this.tag, {
@@ -199,7 +199,7 @@ term = ExprAdapter(Sequence("tag" / Int8ub,
 		111: large_big,
 		114: new_reference,
 		115: small_atom,
-		116: map,
+		116: map_,
 		117: fun,
 		112: new_fun,
 		113: export,
