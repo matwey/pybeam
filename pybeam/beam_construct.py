@@ -26,6 +26,8 @@ from pybeam.eetf_construct import external_term
 
 chunk_atom = PrefixedArray(Int32ub, PascalString(lengthfield = Int8ub, encoding="latin1"))
 
+chunk_atu8 = PrefixedArray(Int32ub, PascalString(lengthfield = Int8ub, encoding="utf8"))
+
 chunk_attr = external_term
 
 chunk_cinf = external_term
@@ -65,6 +67,7 @@ chunk = Struct(
 				{
 #				"Abst" : chunk_abst,
 				b"Atom" : chunk_atom,
+				b"AtU8" : chunk_atu8,
 				b"Attr" : chunk_attr,
 				b"CInf" : chunk_cinf,
 				b"Code" : chunk_code,

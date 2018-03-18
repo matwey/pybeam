@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (c) 2013 Matwey V. Kornilov <matwey.kornilov@gmail.com>
 #
@@ -39,6 +40,11 @@ class BEAMConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build(["burtovoy"])), ["burtovoy"])
 		self.assertEqual(c.parse(c.build(["burtovoy","yegorsaf"])), ["burtovoy","yegorsaf"])
 		self.assertRaises(RangeError, c.parse, b'\x00\x00\xff\x00')
+	def test_chunk_atu8(self):
+		c = beam_construct.chunk_atu8
+		self.assertEqual(c.parse(b'\x00\x00\x00\x00'), [])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x08burtovoy'),["burtovoy"])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x10' + u'Буртовой'.encode('utf8')),[u"Буртовой"])
 	def test_chunk_attr(self):
 		c = beam_construct.chunk_attr
 		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), "burtovoy")
