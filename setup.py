@@ -9,5 +9,5 @@ setup(name='pybeam',
       license='MIT',
       packages=['pybeam'],
       test_suite = 'test',
-      install_requires=['construct>=2.8', 'six'],
+      install_requires=['construct>=2.8,<2.9', 'six'],
       zip_safe=False)

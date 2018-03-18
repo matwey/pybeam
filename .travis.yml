@@ -6,7 +6,7 @@ python:
 - '3.5'
 - '3.6'
 install:
-- pip install 'construct>=2.8'
+- pip install 'construct>=2.8,<2.9'
 script:
 - python -m unittest test
 deploy:
