@@ -36,6 +36,10 @@ class BeamFile(object):
 
 	@property
 	def atoms(self):
+		try:
+			return self.selectChunkByName(b"AtU8").payload
+		except KeyError:
+			pass
 		return self.selectChunkByName(b"Atom").payload
 
 	@property
