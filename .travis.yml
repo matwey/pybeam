@@ -1,13 +1,19 @@
 language: python
 python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-# command to install dependencies
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
+- '3.6'
 install:
-  - "pip install 'construct>=2.8'"
-# command to run tests
+- pip install 'construct>=2.8'
 script:
-  - "python -m unittest test"
+- python -m unittest test
+deploy:
+  provider: pypi
+  user: matwey
+  password:
+    secure: AWqdz752Wms7YXy3m86FigQgn9XDSUI9ArCTMh0O6hu4Irbqkoa06G+XFa+zjj8CSwEYPOpv5gG1xTB/dIC+E6IaZGIDDds7Hm8G+I4vkJs8QAjuIoXANCpxMgsnFc7dpcTzYrNJ9qlYf4fQsPtHBbtPmEHatufMOrEYbg/a14k=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
