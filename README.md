@@ -22,4 +22,4 @@ Both python 2.7 and python 3.3 are supported. Python 3.2 are known not to work.
 * [Erlang BEAM file format](http://www.erlang.se/~bjorn/beam_file_format.html)
 * [Erlang external term format](http://erlang.org/doc/apps/erts/erl_ext_dist.html)
 * [BEAM file format](http://synrc.com/publications/cat/Functional%20Languages/Erlang/BEAM.pdf)
-
+* [BEAM Wisdoms](http://beam-wisdoms.clau.se/en/latest/)
