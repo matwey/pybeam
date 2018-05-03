@@ -2,6 +2,7 @@ pybeam
 ======
 [![Build Status](https://travis-ci.org/matwey/pybeam.svg?branch=master)](https://travis-ci.org/matwey/pybeam)
 [![PyPI version](https://badge.fury.io/py/pybeam.svg)](https://badge.fury.io/py/pybeam)
+[![Documentation Status](https://readthedocs.org/projects/pybeam/badge/?version=latest)](http://pybeam.readthedocs.io/en/latest/?badge=latest)
 
 Python module to parse Erlang BEAM files.
 
