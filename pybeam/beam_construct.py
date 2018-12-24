@@ -24,9 +24,9 @@
 from construct import *
 from pybeam.eetf_construct import external_term
 
-chunk_atom = PrefixedArray(Int32ub, PascalString(lengthfield = Int8ub, encoding="latin1"))
+chunk_atom = PrefixedArray(Int32ub, PascalString(lengthfield=Int8ub, encoding="latin1"))
 
-chunk_atu8 = PrefixedArray(Int32ub, PascalString(lengthfield = Int8ub, encoding="utf8"))
+chunk_atu8 = PrefixedArray(Int32ub, PascalString(lengthfield=Int8ub, encoding="utf8"))
 
 chunk_attr = external_term
 
@@ -61,37 +61,31 @@ chunk_loct = PrefixedArray(Int32ub, Struct("function" / Int32ub,
 	"label" / Int32ub))
 
 chunk = Struct(
-	"chunk_name" / String(4),
+	"chunk_name" / Bytes(4),
 	"size" / Int32ub,
-	"payload" / Switch(this.chunk_name,
-				{
-#				"Abst" : chunk_abst,
-				b"Atom" : chunk_atom,
-				b"AtU8" : chunk_atu8,
-				b"Attr" : chunk_attr,
-				b"CInf" : chunk_cinf,
-				b"Code" : chunk_code,
-				b"ExpT" : chunk_expt,
-#				"FunT" : chunk_funt,
-				b"ImpT" : chunk_impt,
-#				"Line" : chink_line,
-				b"LitT" : chunk_litt,
-				b"LocT" : chunk_loct,
-#				"StrT" : chunk_strt,
-#				"Trac" : chunk_trac,
-				},
-				default = Bytes(lambda ctx: ctx.size)
-			),
-# Aligned(4, ..)
-	Padding(lambda ctx: (4 - ctx.size % 4) % 4, pattern = b'\00'),
+	"payload" / Aligned(4, FixedSized(this.size, Switch(this.chunk_name, {
+#		"Abst" : chunk_abst,
+		b"Atom" : chunk_atom,
+		b"AtU8" : chunk_atu8,
+		b"Attr" : chunk_attr,
+		b"CInf" : chunk_cinf,
+		b"Code" : chunk_code,
+		b"ExpT" : chunk_expt,
+#		"FunT" : chunk_funt,
+		b"ImpT" : chunk_impt,
+#		"Line" : chink_line,
+		b"LitT" : chunk_litt,
+		b"LocT" : chunk_loct,
+#		"StrT" : chunk_strt,
+#		"Trac" : chunk_trac,
+	}, default=GreedyBytes))),
 	)
 
 beam = Struct(
 	"for1" / Const(b'FOR1'),
 	"size" / Int32ub,
 	"beam" / Const(b'BEAM'),
-	"chunk" / GreedyRange(chunk),
-	Terminated,
+	"chunk" / FixedSized(this.size, GreedyRange(chunk)),
 	)
 
 __all__ = ["beam"]

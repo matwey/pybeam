@@ -1,4 +1,3 @@
-#
 # Copyright (c) 2013 Matwey V. Kornilov <matwey.kornilov@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,30 +52,30 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build(-3.1415926)),-3.1415926)
 	def test_atom_utf8(self):
 		c = eetf_construct.atom_utf8
-		self.assertEqual(c.parse(b'\x00\x06myatom'), u'myatom')
-		self.assertEqual(c.parse(c.build(u'robots')),u'robots')
+		self.assertEqual(c.parse(b'\x00\x08\xd0\xb0\xd1\x82\xd0\xbe\xd0\xbc'), u"\u0430\u0442\u043e\u043c")
+		self.assertEqual(c.parse(c.build(u"\u0430\u0442\u043e\u043c")),u"\u0430\u0442\u043e\u043c")
 	def test_small_atom_utf8(self):
 		c = eetf_construct.small_atom_utf8
-		self.assertEqual(c.parse(b'\x06myatom'), u'myatom')
-		self.assertEqual(c.parse(c.build(u'robots')),u'robots')
+		self.assertEqual(c.parse(b'\x08\xd0\xb0\xd1\x82\xd0\xbe\xd0\xbc'), u"\u0430\u0442\u043e\u043c")
+		self.assertEqual(c.parse(c.build(u"\u0430\u0442\u043e\u043c")),u"\u0430\u0442\u043e\u043c")
 	def test_atom(self):
 		c = eetf_construct.atom
-		self.assertEqual(c.parse(b'\x00\x06myatom'), 'myatom')
-		self.assertEqual(c.parse(c.build('robots')),'robots')
+		self.assertEqual(c.parse(b'\x00\x06myatom'), u"myatom")
+		self.assertEqual(c.parse(c.build(u"robots")),u"robots")
 	def test_small_atom(self):
 		c = eetf_construct.small_atom
-		self.assertEqual(c.parse(b'\x06myatom'), 'myatom')
-		self.assertEqual(c.parse(c.build('robots')),'robots')
+		self.assertEqual(c.parse(b'\x06myatom'), u"myatom")
+		self.assertEqual(c.parse(c.build(u"robots")),u"robots")
 	def test_reference(self):
 		c = eetf_construct.reference
-		r = erlang_types.Reference("myatom",0x12,0x48)
+		r = erlang_types.Reference(u"myatom",0x12,0x48)
 		self.assertEqual(c.parse(b'\x64\x00\x06myatom\x00\x00\x00\x12\x48'), r)
 		self.assertEqual(c.parse(c.build(r)),r)
-		self.assertEqual(c.build(r),b'\x64\x00\x06myatom\x00\x00\x00\x12\x48')
+		self.assertEqual(c.build(r),b'\x76\x00\x06myatom\x00\x00\x00\x12\x48')
 	def test_new_reference(self):
 		c = eetf_construct.new_reference
-		r = erlang_types.Reference("myatom",[0x12,0x13],0x48)
-		self.assertEqual(c.parse(b'\x00\x02\x64\x00\x06myatom\x48\x00\x00\x00\x12\x00\x00\x00\x13'), r)
+		r = erlang_types.Reference(u"myatom",[0x12,0x13],0x48)
+		self.assertEqual(c.parse(b'\x00\x02\x76\x00\x06myatom\x48\x00\x00\x00\x12\x00\x00\x00\x13'), r)
 		self.assertEqual(c.parse(c.build(r)),r)
 	def test_port(self):
 		c = eetf_construct.port
@@ -86,21 +85,21 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(b'\x64\x00\x06myatom\x00\x00\x00\x12\x00\x00\x00\x32\x48'), erlang_types.Pid("myatom",0x12,0x32,0x48))
 	def test_small_tuple(self):
 		c = eetf_construct.small_tuple
-		self.assertEqual(c.parse(b"\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
-		self.assertEqual(c.parse(c.build((1,2,'myatom'))),(1,2,'myatom'))
+		self.assertEqual(c.parse(b"\x02\x64\x00\x06myatom\x64\x00\x06robert"), ("myatom","robert"))
+		self.assertEqual(c.parse(c.build((1,2,u"myatom"))),(1,2,u"myatom"))
 	def test_large_tuple(self):
 		c = eetf_construct.large_tuple
-		self.assertEqual(c.parse(b"\x00\x00\x00\x02\x64\x00\x06myatom\x64\x00\x06robert"), ('myatom','robert'))
-		self.assertEqual(c.parse(c.build((1,2,'myatom'))),(1,2,'myatom'))
+		self.assertEqual(c.parse(b"\x00\x00\x00\x02\x64\x00\x06myatom\x64\x00\x06robert"), ("myatom","robert"))
+		self.assertEqual(c.parse(c.build((1,2,u"myatom"))),(1,2,u"myatom"))
 	def test_list(self):
 		c = eetf_construct.list_
-		self.assertEqual(c.parse(b'\x00\x00\x00\x02\x64\x00\x08YegorSaf\x64\x00\x0aRoBurToVoY\x6a'), ['YegorSaf','RoBurToVoY'])
-		self.assertEqual(c.parse(c.build([1,2,3,'OO'])),[1,2,3,'OO'])
-		self.assertEqual(c.parse(c.build(['Nu','poskoku'])),['Nu','poskoku'])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x02\x64\x00\x08YegorSaf\x64\x00\x0aRoBurToVoY\x6a'), ["YegorSaf","RoBurToVoY"])
+		self.assertEqual(c.parse(c.build([1,2,3,u"OO"])),[1,2,3,u"OO"])
+		self.assertEqual(c.parse(c.build([u"Nu",u"poskoku"])),[u"Nu",u"poskoku"])
 		attrs0 = b'\x00\x00\x00\x02h\x02d\x00\x03vsnl\x00\x00\x00\x01n\x10\x00\xb3\xf2\xab&|\xd3\xdeHL\xa0\x0fV\xdf\xc1\x05\x96jh\x02d\x00\tbehaviourl\x00\x00\x00\x01d\x00\ngen_serverjj'
-		self.assertEqual(c.parse(attrs0), [('vsn', [199414093051598402244823387542347575987]), ('behaviour', ['gen_server'])])
+		self.assertEqual(c.parse(attrs0), [("vsn", [199414093051598402244823387542347575987]), ("behaviour", ["gen_server"])])
 		t1 = b'\x00\x00\x00\x01d\x00\x05alignm\x00\x00\x00\x02\x01\x00'
-		self.assertEqual(c.parse(t1), ['align', erlang_types.Binary(b'\x01\x00')])
+		self.assertEqual(c.parse(t1), ["align", erlang_types.Binary(b'\x01\x00')])
 	def test_nil(self):
 		c = eetf_construct.nil
 		self.assertEqual(c.parse(b'\x6a'), [])
@@ -134,10 +133,10 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(c.build(123456789123456789)),123456789123456789)
 	def test_fun(self):
 		c = eetf_construct.fun
-		self.assertEqual(c.parse(b'\00\00\00\x02\x64\x00\x06myatom\x64\x00\x06myatom\x61\x13\x64\x00\x06myatom\x64\x00\x06myatom\x64\x00\x06myatom'), erlang_types.Fun(None,None,None,'myatom',0x13,'myatom','myatom',['myatom','myatom']))
+		self.assertEqual(c.parse(b'\00\00\00\x02\x64\x00\x06myatom\x64\x00\x06myatom\x61\x13\x64\x00\x06myatom\x64\x00\x06myatom\x64\x00\x06myatom'), erlang_types.Fun(None,None,None,"myatom",0x13,"myatom","myatom",["myatom","myatom"]))
 	def test_export(self):
 		c = eetf_construct.export
-		mfa = erlang_types.MFA('myatom','myat0m',0x13)
+		mfa = erlang_types.MFA(u"myatom",u"myat0m",0x13)
 		self.assertEqual(c.parse(b'\x64\x00\x06myatom\x64\x00\x06myat0m\x61\x13'),mfa)
 		self.assertEqual(c.parse(c.build(mfa)),mfa)
 	def test_term(self):
@@ -145,13 +144,13 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(b'\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
 		self.assertEqual(c.parse(c.build(258)), 258)
 		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
-		self.assertEqual(c.build('BurToVoY'), b'\x64\x00\x08BurToVoY')
+		self.assertEqual(c.build(u"BurToVoY"), b'\x76\x00\x08BurToVoY')
 	def test_external(self):
 		c = eetf_construct.external_term
 		self.assertEqual(c.parse(b'\x83\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
 		self.assertEqual(c.parse(c.build(258)), 258)
 		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
-		self.assertEqual(c.build('BurToVoY'), b'\x83\x64\x00\x08BurToVoY')
+		self.assertEqual(c.build(u"BurToVoY"), b'\x83\x76\x00\x08BurToVoY')
 	def test_key_value(self):
 		c = eetf_construct.key_value
 		self.assertEqual(c.parse(b'a\x01a\x02'), (1,2))
