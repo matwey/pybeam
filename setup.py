@@ -14,7 +14,7 @@ setup(name=name,
 	license='MIT',
 	packages=['pybeam'],
 	test_suite='test',
-	install_requires=['construct>=2.8,<2.9', 'six'],
+	install_requires=['construct>=2.8,<2.9', 'six', 'sphinx'],
 	command_options={
 		'build_sphinx': {
 			'project': ('setup.py', name),
