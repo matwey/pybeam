@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Matwey V. Kornilov <matwey.kornilov@gmail.com>
+# Copyright (c) 2013-2018 Matwey V. Kornilov <matwey.kornilov@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-
-# External Term Format
 
 import sys
 from six import text_type
