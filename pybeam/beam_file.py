@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 #
 
-from pybeam.beam_construct import beam
+from pybeam.schema import beam
 
 class BeamFile(object):
 	def __init__(self, f):
@@ -29,7 +29,7 @@ class BeamFile(object):
 		self._tree = beam.parse(f.read())
 
 	def selectChunkByName(self, name):
-		for c in self._tree.chunk:
+		for c in self._tree.chunks:
 			if c.chunk_name == name:
 				return c
 		raise KeyError(name)
