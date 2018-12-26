@@ -3,7 +3,7 @@ from sphinx.setup_command import BuildDoc
 cmdclass = {'build_sphinx': BuildDoc}
 
 name="pybeam"
-version="0.4.1"
+version="0.5-rc1"
 
 setup(name=name,
 	version=version,
