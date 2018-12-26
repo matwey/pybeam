@@ -37,7 +37,7 @@ from construct import (
 	Struct,
 	Switch,)
 
-from pybeam.eetf_construct import external_term
+from pybeam.schema.eetf import external_term
 
 Atom = PrefixedArray(Int32ub, PascalString(lengthfield=Int8ub, encoding="latin1"))
 
