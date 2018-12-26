@@ -1,9 +1,10 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 from sphinx.setup_command import BuildDoc
 cmdclass = {'build_sphinx': BuildDoc}
 
 name="pybeam"
 version="0.5-rc1"
+test_suite="test"
 
 setup(name=name,
 	version=version,
@@ -12,8 +13,8 @@ setup(name=name,
 	author='Matwey V. Kornilov',
 	author_email='matwey.kornilov@gmail.com',
 	license='MIT',
-	packages=['pybeam'],
-	test_suite='test',
+	packages=find_packages(exclude=(test_suite,)),
+	test_suite=test_suite,
 	install_requires=['construct>=2.9,<2.10', 'six', 'sphinx'],
 	command_options={
 		'build_sphinx': {
