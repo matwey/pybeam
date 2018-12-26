@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 # Copyright (c) 2013 Matwey V. Kornilov <matwey.kornilov@gmail.com>
 #
@@ -34,26 +33,26 @@ class BEAMConstructTest(unittest.TestCase):
 	def test_chunk_atom(self):
 		c = beam_construct.chunk_atom
 		self.assertEqual(c.parse(b'\x00\x00\x00\x00'), [])
-		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x08burtovoy'),["burtovoy"])
-		self.assertEqual(c.parse(b'\x00\x00\x00\x02\x08burtovoy\x08yegorsaf'), ["burtovoy","yegorsaf"])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x08burtovoy'),[u"burtovoy"])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x02\x08burtovoy\x08yegorsaf'), [u"burtovoy",u"yegorsaf"])
 		self.assertEqual(c.parse(c.build([])), [])
-		self.assertEqual(c.parse(c.build(["burtovoy"])), ["burtovoy"])
-		self.assertEqual(c.parse(c.build(["burtovoy","yegorsaf"])), ["burtovoy","yegorsaf"])
-		self.assertRaises(RangeError, c.parse, b'\x00\x00\xff\x00')
+		self.assertEqual(c.parse(c.build([u"burtovoy"])), [u"burtovoy"])
+		self.assertEqual(c.parse(c.build([u"burtovoy",u"yegorsaf"])), [u"burtovoy",u"yegorsaf"])
+		self.assertRaises(StreamError, c.parse, b'\x00\x00\xff\x00')
 	def test_chunk_atu8(self):
 		c = beam_construct.chunk_atu8
 		self.assertEqual(c.parse(b'\x00\x00\x00\x00'), [])
-		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x08burtovoy'),["burtovoy"])
-		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x10' + u'Буртовой'.encode('utf8')),[u"Буртовой"])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x08burtovoy'),[u"burtovoy"])
+		self.assertEqual(c.parse(b'\x00\x00\x00\x01\x10\xd0\x91\xd1\x83\xd1\x80\xd1\x82\xd0\xbe\xd0\xb2\xd0\xbe\xd0\xb9'),[u"\u0411\u0443\u0440\u0442\u043e\u0432\u043e\u0439"])
 	def test_chunk_attr(self):
 		c = beam_construct.chunk_attr
-		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), "burtovoy")
-		self.assertEqual(c.parse(c.build("burtovoy")), "burtovoy")
+		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), u"burtovoy")
+		self.assertEqual(c.parse(c.build(u"burtovoy")), u"burtovoy")
 		self.assertEqual(c.parse(b'\x83\x6a'), [])
 	def test_chunk_cinf(self):
 		c = beam_construct.chunk_cinf
-		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), "burtovoy")
-		self.assertEqual(c.parse(c.build("burtovoy")), "burtovoy")
+		self.assertEqual(c.parse(b'\x83\x64\x00\x08burtovoy'), u"burtovoy")
+		self.assertEqual(c.parse(c.build(u"burtovoy")), u"burtovoy")
 		self.assertEqual(c.parse(b'\x83\x6a'), [])
 	def test_chunk_litt(self):
 		c = beam_construct.chunk
