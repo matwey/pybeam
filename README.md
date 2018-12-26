@@ -11,10 +11,10 @@ This is not ready yet, so pull-requests are welcome.
 Quick start:
 ```python
 import pybeam
-p=pybeam.BeamFile("/usr/lib64/erlang/lib/appmon-2.1.14.1/ebin/appmon.beam")
-print p.imports
-print p.exports
-print p.atoms
+p = pybeam.BeamFile("/usr/lib64/erlang/lib/appmon-2.1.14.1/ebin/appmon.beam")
+print(p.imports)
+print(p.exports)
+print(p.atoms)
 ```
 
 Both python 2.7 and python 3.3 are supported. Python 3.2 are known not to work.
