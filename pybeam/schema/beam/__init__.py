@@ -34,6 +34,6 @@ beam = Struct(
 	"for1" / Const(b'FOR1'),
 	"size" / Int32ub,
 	"beam" / Const(b'BEAM'),
-	"chunks" / FixedSized(this.size, GreedyRange(chunk)))
+	"chunks" / FixedSized(this.size-4, GreedyRange(chunk)))
 
 __all__ = ["beam"]
