@@ -137,10 +137,10 @@ atom_cache_ref = ExprAdapter(Int8ub,
 		decoder=lambda obj, ctx: AtomCacheReference(obj))
 small_integer = Int8ub
 integer = Int32sb
-float_ = ExprAdapter(PaddedString(31, "ascii"),
+float_ = ExprAdapter(PaddedString(31, encoding="ascii"),
 		encoder=lambda obj, ctx: u"{:.20e}    ".format(obj),
 		decoder=lambda obj, ctx: float(obj))
-atom = PascalString(lengthfield=Int16ub, encoding="ascii")
+atom = PascalString(lengthfield=Int16ub, encoding="latin1")
 reference = ExprAdapter(Sequence("node" / term_,
 		"id" / Int32ub,
 		"creation" / Int8ub),
@@ -179,7 +179,7 @@ new_reference = ExprAdapter(Sequence("len" / Int16ub,
 		"id" / Array(this.len, Int32ub)),
 		encoder=lambda obj, ctx: (len(obj.id), obj.node, obj.creation, obj.id),
 		decoder=lambda obj, ctx: Reference(obj[1], obj[3], obj[2]))
-small_atom = PascalString(lengthfield=Int8ub, encoding="ascii")
+small_atom = PascalString(lengthfield=Int8ub, encoding="latin1")
 fun = ExprAdapter(Sequence("num_free" / Int32ub,
 		"pid" / term_,
 		"module" / term_,

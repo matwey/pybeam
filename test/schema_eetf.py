@@ -58,14 +58,22 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf.small_atom_utf8
 		self.assertEqual(c.parse(b'\x08\xd0\xb0\xd1\x82\xd0\xbe\xd0\xbc'), u"\u0430\u0442\u043e\u043c")
 		self.assertEqual(c.parse(c.build(u"\u0430\u0442\u043e\u043c")),u"\u0430\u0442\u043e\u043c")
-	def test_atom(self):
+	def test_atom1(self):
 		c = eetf.atom
 		self.assertEqual(c.parse(b'\x00\x06myatom'), u"myatom")
 		self.assertEqual(c.parse(c.build(u"robots")),u"robots")
-	def test_small_atom(self):
+	def test_atom2(self):
+		raw = b'\x00\x06r\xf2b\xf3ts'
+		c = eetf.atom
+		self.assertEqual(c.parse(raw), u"r\u00f2b\u00f3ts")
+	def test_small_atom1(self):
 		c = eetf.small_atom
 		self.assertEqual(c.parse(b'\x06myatom'), u"myatom")
 		self.assertEqual(c.parse(c.build(u"robots")),u"robots")
+	def test_small_atom2(self):
+		raw = b'\x06r\xf2b\xf3ts'
+		c = eetf.small_atom
+		self.assertEqual(c.parse(raw), u"r\u00f2b\u00f3ts")
 	def test_reference(self):
 		c = eetf.reference
 		r = erlang_types.Reference(u"myatom",0x12,0x48)
