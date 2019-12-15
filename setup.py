@@ -1,10 +1,26 @@
-from setuptools import find_packages, setup
-from sphinx.setup_command import BuildDoc
-cmdclass = {'build_sphinx': BuildDoc}
+from setuptools import find_packages, setup, Command
 
 name="pybeam"
 version="0.5"
 test_suite="test"
+
+class BuildSphinx(Command):
+	description = 'Build Sphinx documentation'
+	user_options = []
+
+	def initialize_options(self):
+		pass
+
+	def finalize_options(self):
+		pass
+
+	def run(self):
+		import sphinx.cmd.build as scb
+		scb.build_main(['-b', 'html',
+			'-D', 'project=' + name,
+			'-D', 'version=' + version,
+			'-D', 'release=' + version,
+			'./doc', './build/html'])
 
 setup(name=name,
 	version=version,
@@ -15,13 +31,6 @@ setup(name=name,
 	license='MIT',
 	packages=find_packages(exclude=(test_suite,)),
 	test_suite=test_suite,
-	install_requires=['construct>=2.9,<2.10', 'six', 'sphinx'],
-	command_options={
-		'build_sphinx': {
-			'project': ('setup.py', name),
-			'version': ('setup.py', version),
-			'release': ('setup.py', version),
-			'source_dir': ('setup.py', 'doc')
-		}
-	},
+	install_requires=['construct>=2.9,<2.10', 'six'],
+	cmdclass = {'build_sphinx': BuildSphinx},
 	zip_safe=False)
