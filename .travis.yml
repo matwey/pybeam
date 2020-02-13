@@ -1,4 +1,9 @@
 language: python
+
+env:
+- CONSTRUCT_VERSION='>=2.9,<2.10'
+- CONSTRUCT_VERSION='>=2.10,<2.11'
+
 python:
 - '2.7'
 - '3.4'
@@ -6,8 +11,20 @@ python:
 - '3.6'
 - '3.7'
 - '3.8'
+
+matrix:
+  exclude:
+  - python: '2.7'
+    env: CONSTRUCT_VERSION='>=2.10,<2.11'
+  - python: '3.4'
+    env: CONSTRUCT_VERSION='>=2.10,<2.11'
+  - python: '3.5'
+    env: CONSTRUCT_VERSION='>=2.10,<2.11'
+
 install:
+- pip install construct$CONSTRUCT_VERSION
 - pip install -r requirements.txt
+
 script:
 - python setup.py test
 

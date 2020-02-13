@@ -15,7 +15,7 @@ setup(name=name,
 	license='MIT',
 	packages=find_packages(exclude=(test_suite,)),
 	test_suite=test_suite,
-	install_requires=['construct>=2.9,<2.10', 'six', 'sphinx'],
+	install_requires=['construct>=2.9,<2.11', 'six', 'sphinx'],
 	command_options={
 		'build_sphinx': {
 			'project': ('setup.py', name),
