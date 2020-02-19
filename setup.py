@@ -1,6 +1,9 @@
 from setuptools import find_packages, setup
-from sphinx.setup_command import BuildDoc
-cmdclass = {'build_sphinx': BuildDoc}
+try:
+	from sphinx.setup_command import BuildDoc
+	cmdclass = {'build_sphinx': BuildDoc}
+except ImportError:
+	pass
 
 name="pybeam"
 version="0.6"
@@ -15,7 +18,7 @@ setup(name=name,
 	license='MIT',
 	packages=find_packages(exclude=(test_suite,)),
 	test_suite=test_suite,
-	install_requires=['construct>=2.9,<2.11', 'six', 'sphinx'],
+	install_requires=['construct>=2.9,<2.11', 'six'],
 	command_options={
 		'build_sphinx': {
 			'project': ('setup.py', name),
