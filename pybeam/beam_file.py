@@ -32,21 +32,19 @@ class BeamFile(object):
 		for c in self._chunks:
 			if c.chunk_name == name:
 				return c
-		raise KeyError(name)
+		return None
 
 	@property
 	def atoms(self):
-		try:
-			return self.selectChunkByName(b"AtU8").payload
-		except KeyError:
-			pass
-		return self.selectChunkByName(b"Atom").payload
+		atom = self.selectChunkByName(b"AtU8")
+		atom = atom if atom is not None else self.selectChunkByName(b"Atom")
+		return atom.payload if atom is not None else None
 
 	@property
 	def attributes(self):
 		attr = self.selectChunkByName(b"Attr")
 		# convert from proplist to dict
-		return dict(attr.payload)
+		return dict(attr.payload) if attr is not None else None
 
 	@property
 	def code(self):
@@ -56,23 +54,24 @@ class BeamFile(object):
 	@property
 	def compileinfo(self):
 		cinf = self.selectChunkByName(b"CInf")
-		return dict(cinf.payload)
+		return dict(cinf.payload) if cinf is not None else None
 
 	@property
 	def exports(self):
 		expt = self.selectChunkByName(b"ExpT")
 		atoms = self.atoms
-		return [(atoms[e.function-1], e.arity, e.label) for e in expt.payload.entry]
+		return [(atoms[e.function-1], e.arity, e.label) for e in expt.payload.entry] if expt is not None else None
 
 	@property
 	def literals(self):
-		return [e.term for e in self.selectChunkByName(b"LitT").payload.data.entry]
+		litt = self.selectChunkByName(b"LitT")
+		return litt.payload.entry if litt is not None else None
 
 	@property
 	def imports(self):
 		impt = self.selectChunkByName(b"ImpT")
 		atoms = self.atoms
-		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.payload.entry]
+		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.payload.entry] if impt is not None else None
 
 	@property
 	def modulename(self):
