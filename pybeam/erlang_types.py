@@ -20,86 +20,31 @@
 # THE SOFTWARE.
 #
 
-from six import iterbytes
+from collections import namedtuple
+from six import PY2
 
-class AtomCacheReference(object):
-	def __init__(self, index):
-		self.index = index
-	def __eq__(self,other):
-		return self.index == other.index
+class AtomCacheReference(int):
+	pass
 
-class Reference(object):
-	def __init__(self, node, id_, creation):
-		self.node = node
-		self.id = id_
-		self.creation = creation
-	def __eq__(self,other):
-		return self.node == other.node and self.id == other.id and self.creation == other.creation
+Reference = namedtuple("Reference", ["node", "id", "creation"])
 
-class Port(object):
-	def __init__(self, node, id_, creation):
-		self.node = node
-		self.id = id_
-		self.creation = creation
-	def __eq__(self,other):
-		return self.node == other.node and self.id == other.id and self.creation == other.creation
+Port = namedtuple("Port", ["node", "id", "creation"])
 
-class Pid(object):
-	def __init__(self, node, id_, serial, creation):
-		self.node = node
-		self.id = id_
-		self.serial = serial
-		self.creation = creation
-	def __eq__(self,other):
-		return self.node == other.node and self.id == other.id and self.creation == other.creation and self.serial == other.serial
+Pid = namedtuple("Pid", ["node", "id", "serial", "creation"])
 
-class String(object):
-	def __init__(self, value):
-		self.value = value
-	def __eq__(self, other):
-		return self.value == other.value
-	def __iter__(self):
-		return iterbytes(self.value)
-	def __len__(self):
-		return len(self.value)
+if PY2:
+	class String(bytes):
+		def __getitem__(self, index):
+			return ord(super(String, self).__getitem__(index))
+else:
+	class String(bytes):
+		pass
 
-class Binary(object):
-	def __init__(self, value):
-		self.value = value
-	def __eq__(self, other):
-		return self.value == other.value
+class Binary(bytes):
+	pass
 
-class Fun(object):
-	def __init__(self, arity, uniq, index, module, oldindex, olduniq, pid, free):
-		self.arity = arity
-		self.uniq = uniq
-		self.index = index
-		self.module = module
-		self.oldindex = oldindex
-		self.olduniq = olduniq
-		self.pid = pid
-		self.free = free
-	def __eq__(self, other):
-		return (self.arity == other.arity
-			and self.uniq == other.uniq
-			and self.index == other.index
-			and self.module == other.module
-			and self.oldindex == other.oldindex
-			and self.olduniq == other.olduniq
-			and self.pid == other.pid
-			and self.free == other.free)
+Fun = namedtuple("Fun", ["arity", "uniq", "index", "module", "oldindex", "olduniq", "pid", "free"])
 
-class MFA(object):
-	def __init__(self, module, function, arity):
-		self.module = module
-		self.function = function
-		self.arity = arity
-	def __eq__(self, other):
-		return self.module == other.module and self.function == other.function and self.arity == other.arity
+MFA = namedtuple("MFA", ["module", "function", "arity"])
 
-class BitBinary(object):
-	def __init__(self, value, bits):
-		self.value = value
-		self.bits = bits
-	def __eq__(self, other):
-		return self.value == other.value and self.bits == other.bits
+BitBinary = namedtuple("BitBinary", ["value", "bits"])

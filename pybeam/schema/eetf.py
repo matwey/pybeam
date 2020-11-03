@@ -133,7 +133,7 @@ def tag(obj):
 term_ = LazyBound(lambda: term)
 
 atom_cache_ref = ExprAdapter(Int8ub,
-		encoder=lambda obj, ctx: obj.index,
+		encoder=lambda obj, ctx: obj,
 		decoder=lambda obj, ctx: AtomCacheReference(obj))
 small_integer = Int8ub
 integer = Int32sb
@@ -163,13 +163,13 @@ nil = ExprAdapter(Sequence(),
 		encoder=lambda obj, ctx: (),
 		decoder=lambda obj, ctx: [])
 string = ExprAdapter(Prefixed(Int16ub, GreedyBytes),
-		encoder=lambda obj, ctx: obj.value,
+		encoder=lambda obj, ctx: obj,
 		decoder=lambda obj, ctx: etString(obj))
 list_ = ListAdapter(Sequence("len" / Int32ub,
 		Array(this.len, term_),
 		term_))
 binary = ExprAdapter(Prefixed(Int32ub, GreedyBytes),
-		encoder=lambda obj, ctx: obj.value,
+		encoder=lambda obj, ctx: obj,
 		decoder=lambda obj, ctx: Binary(obj))
 small_big = BigInteger(Int8ub)
 large_big = BigInteger(Int32ub)
