@@ -26,10 +26,10 @@ class BeamFile(object):
 	def __init__(self, f):
 		if not hasattr(f, 'read'):
 			f = open(f, "rb")
-		self._tree = beam.parse(f.read())
+		self._chunks = beam.parse(f.read())
 
 	def selectChunkByName(self, name):
-		for c in self._tree.chunks:
+		for c in self._chunks:
 			if c.chunk_name == name:
 				return c
 		raise KeyError(name)
