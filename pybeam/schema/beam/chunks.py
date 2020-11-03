@@ -26,7 +26,6 @@ from construct import (
 	Aligned,
 	Bytes,
 	Compressed,
-	Computed,
 	FixedSized,
 	GreedyBytes,
 	Int32ub,
@@ -64,12 +63,9 @@ ImpT = Struct("entry" / PrefixedArray(Int32ub, Struct("module" / Int32ub,
 	"function" / Int32ub,
 	"arity" / Int32ub)))
 
-uncomp_chunk_litt = Struct("entry" / PrefixedArray(Int32ub, Prefixed(Int32ub, Struct("term" / external_term))))
+uncomp_chunk_litt = PrefixedArray(Int32ub, Prefixed(Int32ub, external_term))
 LitT = Struct(Int32ub,
-	"data" / Prefixed(Computed(lambda ctx: ctx._.size-4),
-		Compressed(uncomp_chunk_litt, "zlib")
-	)
-)
+	"entry" / Compressed(uncomp_chunk_litt, "zlib"))
 
 LocT = PrefixedArray(Int32ub, Struct("function" / Int32ub,
 	"arity" / Int32ub,
