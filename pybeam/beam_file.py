@@ -26,53 +26,49 @@ class BeamFile(object):
 	def __init__(self, f):
 		if not hasattr(f, 'read'):
 			f = open(f, "rb")
-		self._tree = beam.parse(f.read())
+		self._chunks = beam.parse(f.read())
 
 	def selectChunkByName(self, name):
-		for c in self._tree.chunks:
-			if c.chunk_name == name:
-				return c
-		raise KeyError(name)
+		return self._chunks.get(name)
 
 	@property
 	def atoms(self):
-		try:
-			return self.selectChunkByName(b"AtU8").payload
-		except KeyError:
-			pass
-		return self.selectChunkByName(b"Atom").payload
+		atom = self.selectChunkByName(b"AtU8")
+		atom = atom if atom is not None else self.selectChunkByName(b"Atom")
+		return atom
 
 	@property
 	def attributes(self):
 		attr = self.selectChunkByName(b"Attr")
 		# convert from proplist to dict
-		return dict(attr.payload)
+		return dict(attr) if attr is not None else None
 
 	@property
 	def code(self):
-		code = self.selectChunkByName(b"Code").payload
+		code = self.selectChunkByName(b"Code")
 		return (code.set, code.opcode_max, code.labels, code.functions, code.code)
 
 	@property
 	def compileinfo(self):
 		cinf = self.selectChunkByName(b"CInf")
-		return dict(cinf.payload)
+		return dict(cinf) if cinf is not None else None
 
 	@property
 	def exports(self):
 		expt = self.selectChunkByName(b"ExpT")
 		atoms = self.atoms
-		return [(atoms[e.function-1], e.arity, e.label) for e in expt.payload.entry]
+		return [(atoms[e.function-1], e.arity, e.label) for e in expt.entry] if expt is not None else None
 
 	@property
 	def literals(self):
-		return [e.term for e in self.selectChunkByName(b"LitT").payload.data.entry]
+		litt = self.selectChunkByName(b"LitT")
+		return litt.entry if litt is not None else None
 
 	@property
 	def imports(self):
 		impt = self.selectChunkByName(b"ImpT")
 		atoms = self.atoms
-		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.payload.entry]
+		return [(atoms[e.module-1], atoms[e.function-1], e.arity) for e in impt.entry] if impt is not None else None
 
 	@property
 	def modulename(self):

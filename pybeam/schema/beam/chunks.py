@@ -26,14 +26,13 @@ from construct import (
 	Aligned,
 	Bytes,
 	Compressed,
-	Computed,
-	FixedSized,
 	GreedyBytes,
 	Int32ub,
 	Int8ub,
 	PascalString,
 	Prefixed,
 	PrefixedArray,
+	Sequence,
 	Struct,
 	Switch,)
 
@@ -53,8 +52,7 @@ Code = Struct("headerlen" / Int32ub,
 	"labels" / Int32ub,
 	"functions" / Int32ub,
 	Bytes(lambda ctx: ctx.headerlen-16),
-	Bytes(lambda ctx: ctx._.size-ctx.headerlen-4),
-	)
+	GreedyBytes)
 
 ExpT = Struct("entry" / PrefixedArray(Int32ub, Struct("function" / Int32ub,
 	"arity" / Int32ub,
@@ -64,21 +62,17 @@ ImpT = Struct("entry" / PrefixedArray(Int32ub, Struct("module" / Int32ub,
 	"function" / Int32ub,
 	"arity" / Int32ub)))
 
-uncomp_chunk_litt = Struct("entry" / PrefixedArray(Int32ub, Prefixed(Int32ub, Struct("term" / external_term))))
+uncomp_chunk_litt = PrefixedArray(Int32ub, Prefixed(Int32ub, external_term))
 LitT = Struct(Int32ub,
-	"data" / Prefixed(Computed(lambda ctx: ctx._.size-4),
-		Compressed(uncomp_chunk_litt, "zlib")
-	)
-)
+	"entry" / Compressed(uncomp_chunk_litt, "zlib"))
 
 LocT = PrefixedArray(Int32ub, Struct("function" / Int32ub,
 	"arity" / Int32ub,
 	"label" / Int32ub))
 
-chunk = Struct(
+chunk = Sequence(
 	"chunk_name" / Bytes(4),
-	"size" / Int32ub,
-	"payload" / Aligned(4, FixedSized(this.size, Switch(this.chunk_name, {
+	Aligned(4, Prefixed(Int32ub, Switch(this.chunk_name, {
 #		"Abst" : chunk_abst,
 		b"Atom" : Atom,
 		b"AtU8" : AtU8,
@@ -93,7 +87,6 @@ chunk = Struct(
 		b"LocT" : LocT,
 #		"StrT" : chunk_strt,
 #		"Trac" : chunk_trac,
-	}, default=GreedyBytes))),
-	)
+	}, default=GreedyBytes))))
 
 __all__ = ["chunk"]
