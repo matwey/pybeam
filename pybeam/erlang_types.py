@@ -22,9 +22,13 @@
 
 from collections import namedtuple
 from six import PY2
+import warnings
 
 class AtomCacheReference(int):
-	pass
+	@property
+	def index(self):
+		warnings.warn("x.index is deprecated; use x instead", DeprecationWarning)
+		return self
 
 Reference = namedtuple("Reference", ["node", "id", "creation"])
 
@@ -32,16 +36,21 @@ Port = namedtuple("Port", ["node", "id", "creation"])
 
 Pid = namedtuple("Pid", ["node", "id", "serial", "creation"])
 
-if PY2:
-	class String(bytes):
+class String(bytes):
+	@property
+	def value(self):
+		warnings.warn("x.value is deprecated; use x instead", DeprecationWarning)
+		return self
+
+	if PY2:
 		def __getitem__(self, index):
 			return ord(super(String, self).__getitem__(index))
-else:
-	class String(bytes):
-		pass
 
 class Binary(bytes):
-	pass
+	@property
+	def value(self):
+		warnings.warn("x.value is deprecated; use x instead", DeprecationWarning)
+		return self
 
 Fun = namedtuple("Fun", ["arity", "uniq", "index", "module", "oldindex", "olduniq", "pid", "free"])
 
