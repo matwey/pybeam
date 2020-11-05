@@ -20,15 +20,23 @@
 # THE SOFTWARE.
 #
 
-from construct import Const, FocusedSeq, GreedyRange, Int32ub, Prefixed, Terminated
+from construct import Adapter, Const, FocusedSeq, GreedyRange, Int32ub, Prefixed, Terminated
 
 from pybeam.schema.beam.chunks import chunk
+
+
+class DictAdapter(Adapter):
+	def _decode(self, obj, context, path):
+		return dict(obj)
+
+	def _encode(self, obj, context, path):
+		return obj.items()
 
 beam = FocusedSeq("chunks",
 	Const(b'FOR1'),
 	"chunks" / Prefixed(Int32ub, FocusedSeq("chunks",
 		Const(b'BEAM'),
-		"chunks" / GreedyRange(chunk),
+		"chunks" / DictAdapter(GreedyRange(chunk)),
 		Terminated)))
 
 __all__ = ["beam"]
