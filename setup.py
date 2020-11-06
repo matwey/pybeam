@@ -6,7 +6,7 @@ except ImportError:
 	pass
 
 name="pybeam"
-version="0.7-rc2"
+version="0.7-rc3"
 test_suite="test"
 
 setup(name=name,
