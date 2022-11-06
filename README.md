@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/matwey/pybeam.svg?branch=master)](https://travis-ci.org/matwey/pybeam)
+[![Python](https://github.com/matwey/pybeam/actions/workflows/python.yml/badge.svg)](https://github.com/matwey/pybeam/actions/workflows/python.yml)
 [![PyPI version](https://badge.fury.io/py/pybeam.svg)](https://badge.fury.io/py/pybeam)
 [![Documentation Status](https://readthedocs.org/projects/pybeam/badge/?version=latest)](http://pybeam.readthedocs.io/en/latest/?badge=latest)
 
