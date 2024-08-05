@@ -21,7 +21,6 @@
 #
 
 import sys
-from six import text_type
 
 from construct import this
 from construct import (
@@ -111,7 +110,7 @@ def tag(obj):
 		AtomCacheReference : 82,
 		int : 98,
 		float : 70,
-		text_type : 118, # unicode in Python 2 and str in Python 3
+		str : 118, # unicode in Python 2 and str in Python 3
 		Reference : 114,
 		Port : 102,
 		Pid : 103,

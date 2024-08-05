@@ -6,7 +6,6 @@ pybeam
 ======
 Python module to parse Erlang BEAM files.
 
-Both python 2.7 and python 3.3 are supported. Python 3.2 are known not to work.
 Pull-requests are always welcome.
 
 ## Quick start:

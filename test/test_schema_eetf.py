@@ -21,7 +21,6 @@
 
 import pybeam.schema.eetf as eetf
 from pybeam import erlang_types
-from six import int2byte
 import unittest
 
 class EETFConstructTest(unittest.TestCase):
@@ -122,9 +121,9 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(b'\x00\x0aRoBurToVoY'), erlang_types.String(b'RoBurToVoY'))
 		s = erlang_types.String(b'RoBurToVoY')
 		self.assertEqual(c.parse(c.build(s)),s)
-		n = b"\x01\x00" + b"".join(map(int2byte, range(0,256)))
+		n = b"\x01\x00" + bytes(range(0,256))
 		self.assertListEqual(list(c.parse(n)), list(range(0,256)))
-		self.assertEqual(c.build(erlang_types.String(b"".join(map(int2byte, range(0,256))))), n)
+		self.assertEqual(c.build(erlang_types.String(bytes(range(0,256)))), n)
 	def test_binary(self):
 		c = eetf.binary
 		self.assertEqual(c.parse(b'\x00\x00\x00\x0aRoBurToVoY'), erlang_types.Binary(b'RoBurToVoY'))

@@ -21,7 +21,6 @@
 #
 
 from collections import namedtuple
-from six import PY2
 import warnings
 
 class AtomCacheReference(int):
@@ -41,10 +40,6 @@ class String(bytes):
 	def value(self):
 		warnings.warn("x.value is deprecated; use x instead", DeprecationWarning)
 		return self
-
-	if PY2:
-		def __getitem__(self, index):
-			return ord(super(String, self).__getitem__(index))
 
 class Binary(bytes):
 	@property

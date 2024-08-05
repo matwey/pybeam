@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pybeam"
+version = "0.7"
+description = "Python module to parse Erlang BEAM files"
+authors = [
+    {name = "Matwey V. Kornilov", email = "matwey.kornilov@gmail.com"},
+]
+dependencies = [
+    "construct>=2.9,<2.11",
+]
+requires-python = ">=3.7"
+readme = "README.md"
+license = {file = "LICENSE"}
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.urls]
+Repository = "https://github.com/matwey/pybeam.git"
+Issues = "https://github.com/matwey/pybeam/issues"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "pybeam",
+    "test",
+]
