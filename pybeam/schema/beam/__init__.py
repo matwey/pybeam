@@ -20,7 +20,19 @@
 # THE SOFTWARE.
 #
 
-from construct import Adapter, Const, FocusedSeq, GreedyRange, Int32ub, Prefixed, Terminated
+from construct import this
+from construct import (
+	Adapter,
+	Bytes,
+	Compressed,
+	Const,
+	FocusedSeq,
+	GreedyRange,
+	Int32ub,
+	Peek,
+	Prefixed,
+	Switch,
+	Terminated,)
 
 from pybeam.schema.beam.chunks import chunk
 
@@ -32,11 +44,20 @@ class DictAdapter(Adapter):
 	def _encode(self, obj, context, path):
 		return obj.items()
 
-beam = FocusedSeq("chunks",
+uncompressed_beam = FocusedSeq("chunks",
 	Const(b'FOR1'),
 	"chunks" / Prefixed(Int32ub, FocusedSeq("chunks",
 		Const(b'BEAM'),
 		"chunks" / DictAdapter(GreedyRange(chunk)),
 		Terminated)))
+
+gzip_compressed_beam = Compressed(uncompressed_beam, "gzip")
+
+beam = FocusedSeq("beam",
+	"magic" / Peek(Bytes(2)),
+	"beam" / Switch(this.magic, {
+		b'FO' : uncompressed_beam,
+		b'\x1f\x8b' : gzip_compressed_beam,
+	}))
 
 __all__ = ["beam"]

@@ -40,6 +40,9 @@ class BEAMConstructTest(unittest.TestCase):
 	def test_beam3(self):
 		c = beam
 		self.assertRaises(TerminatedError, lambda: c.parse(b'FOR1\x00\x00\x00\x0cBEAMAtU8\x00\x00\x002'))
+	def test_beam_compressed1(self):
+		c = beam
+		self.assertEqual(c.parse(b'\x1f\x8b\x08\x08\x9f\xf3\xb0f\x02\xffc.beam\x00s\xf3\x0f2d```qru\xf4\x05\x00\x86\x81S6\x0c\x00\x00\x00'), {})
 	def test_chunk_atom(self):
 		c = Atom
 		self.assertEqual(c.parse(b'\x00\x00\x00\x00'), [])
