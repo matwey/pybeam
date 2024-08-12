@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pybeam"
-version = "0.8-rc1"
+version = "0.8"
 description = "Python module to parse Erlang BEAM files"
 authors = [
     {name = "Matwey V. Kornilov", email = "matwey.kornilov@gmail.com"},
