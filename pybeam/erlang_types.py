@@ -33,26 +33,19 @@ Reference = namedtuple("Reference", ["node", "id", "creation"])
 
 Port = namedtuple("Port", ["node", "id", "creation"])
 
-class String:
-	def __init__(self, value):
-		self.value = value
-	def __eq__(self, other):
-		return self.value == other.value
-	def __repr__(self):
-		return "'%s'" % self.value
+Pid = namedtuple("Pid", ["node", "id", "serial", "creation"])
 
-class Binary:
-	def __init__(self, value):
-		self._value = value
-	def __eq__(self, other):
-		return self._value == other.value
-	def __repr__(self):
-		return "<<"+','.join(map(lambda x: str(ord(x)), self.value))+">>"
-
+class String(bytes):
 	@property
 	def value(self):
 		warnings.warn("x.value is deprecated; use x instead", DeprecationWarning)
-		return self._value
+		return self
+
+class Binary(bytes):
+	@property
+	def value(self):
+		warnings.warn("x.value is deprecated; use x instead", DeprecationWarning)
+		return self
 
 Fun = namedtuple("Fun", ["arity", "uniq", "index", "module", "oldindex", "olduniq", "pid", "free"])
 
