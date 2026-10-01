@@ -78,7 +78,7 @@ class EETFConstructTest(unittest.TestCase):
 		r = erlang_types.Reference(u"myatom",0x12,0x48)
 		self.assertEqual(c.parse(b'\x64\x00\x06myatom\x00\x00\x00\x12\x48'), r)
 		self.assertEqual(c.parse(c.build(r)),r)
-		self.assertEqual(c.build(r),b'\x76\x00\x06myatom\x00\x00\x00\x12\x48')
+		self.assertEqual(c.build(r),b'\x77\x06myatom\x00\x00\x00\x12\x48')
 	def test_new_reference(self):
 		c = eetf.new_reference
 		r = erlang_types.Reference(u"myatom",[0x12,0x13],0x48)
@@ -106,7 +106,7 @@ class EETFConstructTest(unittest.TestCase):
 		attrs0 = b'\x00\x00\x00\x02h\x02d\x00\x03vsnl\x00\x00\x00\x01n\x10\x00\xb3\xf2\xab&|\xd3\xdeHL\xa0\x0fV\xdf\xc1\x05\x96jh\x02d\x00\tbehaviourl\x00\x00\x00\x01d\x00\ngen_serverjj'
 		self.assertEqual(c.parse(attrs0), [("vsn", [199414093051598402244823387542347575987]), ("behaviour", ["gen_server"])])
 		t1 = b'\x00\x00\x00\x01d\x00\x05alignm\x00\x00\x00\x02\x01\x00'
-		self.assertEqual(c.parse(t1), ["align", erlang_types.Binary(b'\x01\x00')])
+		self.assertEqual(c.parse(t1), erlang_types.ImproperList(["align"], erlang_types.Binary(b'\x01\x00')))
 	def test_nil(self):
 		c = eetf.nil
 		self.assertEqual(c.parse(b'\x6a'), [])
@@ -151,13 +151,13 @@ class EETFConstructTest(unittest.TestCase):
 		self.assertEqual(c.parse(b'\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
 		self.assertEqual(c.parse(c.build(258)), 258)
 		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
-		self.assertEqual(c.build(u"BurToVoY"), b'\x76\x00\x08BurToVoY')
+		self.assertEqual(c.build(u"BurToVoY"), b'\x77\x08BurToVoY')
 	def test_external(self):
 		c = eetf.external_term
 		self.assertEqual(c.parse(b'\x83\x6f\x00\x00\x00\x02\x00\x02\x01'), 258)
 		self.assertEqual(c.parse(c.build(258)), 258)
 		self.assertEqual(c.parse(c.build([3,2,1])), [3,2,1])
-		self.assertEqual(c.build(u"BurToVoY"), b'\x83\x76\x00\x08BurToVoY')
+		self.assertEqual(c.build(u"BurToVoY"), b'\x83\x77\x08BurToVoY')
 	def test_key_value(self):
 		c = eetf.key_value
 		self.assertEqual(c.parse(b'a\x01a\x02'), (1,2))
@@ -166,3 +166,28 @@ class EETFConstructTest(unittest.TestCase):
 		c = eetf.map_
 		self.assertEqual(c.parse(b'\x00\x00\x00\x02a\x01a\x02a\x03a\x04'), {1:2,3:4})
 		self.assertEqual(c.parse(c.build({1:2,3:4})), {1:2,3:4})
+	def test_canonical(self):
+		# Reference encodings from term_to_binary(Term, [{minor_version,2},deterministic])
+		c = eetf.external_term
+		def check(term, raw):
+			self.assertEqual(c.build(term), raw)
+			self.assertEqual(c.parse(raw), term)
+		check(0, b'\x83a\x00')
+		check(255, b'\x83a\xff')
+		check(256, b'\x83b\x00\x00\x01\x00')
+		check(-1, b'\x83b\xff\xff\xff\xff')
+		check(1 << 31, b'\x83n\x04\x00\x00\x00\x00\x80')
+		check(-(1 << 31) - 1, b'\x83n\x04\x01\x01\x00\x00\x80')
+		self.assertEqual(c.build(1 << 2048)[:6], b'\x83o\x00\x00\x01\x01')
+		self.assertEqual(c.build(u"ж" * 128)[:6], b'\x83v\x01\x00\xd0\xb6')
+		self.assertEqual(c.build(tuple(range(1, 257)))[:6], b'\x83i\x00\x00\x01\x00')
+		check(erlang_types.String(b"abc"), b'\x83k\x00\x03abc')
+		check({"b": 1, "a": 2, 2: "x", (1,): "w", erlang_types.Binary(b"z"): 3},
+			b'\x83t\x00\x00\x00\x05a\x02w\x01xw\x01aa\x02w\x01ba\x01h\x01a\x01w\x01wm\x00\x00\x00\x01za\x03')
+	def test_improper_list(self):
+		c = eetf.external_term
+		il = erlang_types.ImproperList
+		self.assertEqual(c.parse(b'\x83l\x00\x00\x00\x01a\x01a\x02'), il([1], 2))
+		self.assertEqual(c.build(il([1], 2)), b'\x83l\x00\x00\x00\x01a\x01a\x02')
+		self.assertEqual(c.build(il([erlang_types.String(b"a")], erlang_types.Binary(b'\x01'))),
+			b'\x83l\x00\x00\x00\x01k\x00\x01am\x00\x00\x00\x01\x01')

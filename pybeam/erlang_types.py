@@ -52,3 +52,6 @@ Fun = namedtuple("Fun", ["arity", "uniq", "index", "module", "oldindex", "olduni
 MFA = namedtuple("MFA", ["module", "function", "arity"])
 
 BitBinary = namedtuple("BitBinary", ["value", "bits"])
+
+# [E1, ..., En | Tail] where Tail is not a list
+ImproperList = namedtuple("ImproperList", ["elements", "tail"])
